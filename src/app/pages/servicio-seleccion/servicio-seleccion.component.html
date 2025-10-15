@@ -1,0 +1,38 @@
+<div class="servicio-container">
+  <!-- Header con info del usuario -->
+  <div class="header">
+    <h1>Sistema de Control de Tickets de Casino</h1>
+    <div class="user-info" *ngIf="empleado">
+      <h2>{{ empleado.nombre }}</h2>
+      <p class="rut">{{ empleado.rut }}</p>
+    </div>
+  </div>
+
+  <!-- Pregunta principal -->
+  <div class="question-card">
+    <p class="question-text">
+      ¿Desea empaquetar<br>(Permutar) para llevar su<br>comida?
+    </p>
+  </div>
+
+  <!-- Botones de selección -->
+  <div class="buttons-container">
+    <button class="btn-option btn-si" (click)="seleccionarParaLlevar()">
+      SI
+    </button>
+    
+    <button class="btn-option btn-omitir" (click)="seleccionarParaServir()">
+      OMITIR
+      <svg class="arrow-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M9 18l6-6-6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </button>
+  </div>
+
+  <!-- Link alternativo -->
+  <div class="alternative-access">
+    <a href="#" class="link-credential" (click)="volver(); $event.preventDefault()">
+      Utilizar Credencial
+    </a>
+  </div>
+</div>

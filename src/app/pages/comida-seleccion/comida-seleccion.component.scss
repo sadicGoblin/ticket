@@ -1,0 +1,441 @@
+// Variables
+$primary-blue: #0046b5;
+$secondary-blue: #003a99;
+$green-action: #4caf50;
+$white: #ffffff;
+$light-gray: #ecf0f1;
+$disabled-gray: #bdc3c7;
+$card-border: #3498db;
+
+.comida-container {
+  min-height: 100vh;
+  background: linear-gradient(180deg, $primary-blue 0%, $secondary-blue 100%);
+  padding: 20px 20px 120px 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  position: relative;
+}
+
+/* Header */
+.header {
+  text-align: center;
+  color: $white;
+  margin-bottom: 2.5rem;
+  animation: fadeInDown 0.6s ease;
+
+  h1 {
+    font-size: 1.8rem;
+    margin-bottom: 2rem;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+  }
+
+  .user-info {
+    h2 {
+      color: $white;
+      font-size: 2rem;
+      font-weight: 700;
+      margin: 0 0 0.5rem 0;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .rut {
+      color: rgba($white, 0.9);
+      font-size: 1.5rem;
+      font-weight: 600;
+      margin: 0;
+      font-family: 'Courier New', monospace;
+      letter-spacing: 2px;
+      background: rgba(255, 255, 255, 0.15);
+      padding: 8px 20px;
+      border-radius: 8px;
+      display: inline-block;
+    }
+  }
+}
+
+/* Grid de opciones */
+.comida-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+  max-width: 900px;
+  width: 100%;
+  margin-bottom: 2rem;
+  animation: fadeInUp 0.6s ease;
+}
+
+.comida-card {
+  background: $white;
+  padding: 30px 20px;
+  border-radius: 16px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 15px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  position: relative;
+  border: 3px solid transparent;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  min-height: 180px;
+
+  &.disponible {
+    .icon-container {
+      color: $primary-blue;
+    }
+
+    .comida-nombre {
+      color: #2c3e50;
+    }
+
+    &:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+      border-color: $card-border;
+    }
+
+    &.seleccionado {
+      border-color: $green-action;
+      background: lighten($green-action, 48%);
+      box-shadow: 0 8px 24px rgba($green-action, 0.4);
+
+      .icon-container {
+        color: $green-action;
+      }
+
+      .comida-nombre {
+        color: darken($green-action, 10%);
+        font-weight: 700;
+      }
+    }
+  }
+
+  &.no-disponible {
+    opacity: 0.4;
+    cursor: not-allowed;
+    
+    .icon-container {
+      color: $disabled-gray;
+    }
+
+    .comida-nombre {
+      color: $disabled-gray;
+    }
+
+    &:hover {
+      transform: none;
+    }
+  }
+
+  .icon-container {
+    width: 60px;
+    height: 60px;
+    transition: color 0.3s ease;
+
+    svg {
+      width: 100%;
+      height: 100%;
+    }
+  }
+
+  .comida-nombre {
+    font-size: 1.3rem;
+    font-weight: 600;
+    margin: 0;
+    text-align: center;
+    transition: all 0.3s ease;
+  }
+
+  .check-mark {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    width: 32px;
+    height: 32px;
+    background: $green-action;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    animation: scaleIn 0.3s ease;
+
+    svg {
+      width: 20px;
+      height: 20px;
+      fill: $white;
+    }
+  }
+}
+
+/* Footer de acción */
+.action-footer {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: #333333;
+  padding: 20px;
+  box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.3);
+  z-index: 50;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 20px;
+}
+
+.btn-volver {
+  padding: 14px 30px;
+  font-size: 1.1rem;
+  font-weight: 600;
+  border: 2px solid rgba($white, 0.3);
+  border-radius: 8px;
+  background: transparent;
+  color: $white;
+  cursor: pointer;
+  transition: all 0.3s ease;
+
+  &:hover {
+    background: rgba($white, 0.1);
+    border-color: $white;
+    transform: translateY(-2px);
+  }
+}
+
+.btn-siguiente {
+  flex: 1;
+  max-width: 400px;
+  margin-left: auto;
+  padding: 18px;
+  font-size: 1.3rem;
+  font-weight: 700;
+  border: none;
+  border-radius: 8px;
+  background: $green-action;
+  color: $white;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+
+  &:hover:not(:disabled) {
+    background: darken($green-action, 10%);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.4);
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    background: #666;
+  }
+}
+
+/* Overlay de impresión */
+.printing-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(180deg, $primary-blue 0%, $secondary-blue 100%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+  animation: fadeIn 0.3s ease;
+  padding: 20px;
+}
+
+.printing-content {
+  text-align: center;
+  color: $white;
+  width: 100%;
+  max-width: 500px;
+
+  .user-name {
+    font-size: 2.5rem;
+    font-weight: 700;
+    margin: 0 0 1rem 0;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    animation: fadeInDown 0.5s ease;
+  }
+
+  .user-rut {
+    font-size: 2rem;
+    font-weight: 600;
+    margin: 0 0 4rem 0;
+    font-family: 'Courier New', monospace;
+    letter-spacing: 3px;
+    background: rgba(255, 255, 255, 0.15);
+    padding: 12px 30px;
+    border-radius: 10px;
+    display: inline-block;
+    animation: fadeInDown 0.6s ease;
+  }
+
+  .printer-icon {
+    width: 120px;
+    height: 120px;
+    margin: 0 auto 2rem;
+    animation: pulse 1.5s ease infinite;
+    
+    svg {
+      width: 100%;
+      height: 100%;
+      fill: $white;
+      filter: drop-shadow(0 4px 12px rgba(0, 0, 0, 0.3));
+    }
+  }
+
+  .printing-text {
+    font-size: 2rem;
+    font-weight: 700;
+    margin: 0 0 4rem 0;
+    animation: fadeInUp 0.7s ease;
+  }
+
+  .btn-terminar {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    width: 100%;
+    padding: 20px;
+    font-size: 1.5rem;
+    font-weight: 700;
+    border: none;
+    background: $green-action;
+    color: $white;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.3);
+    animation: fadeInUp 0.8s ease;
+
+    &:hover {
+      background: darken($green-action, 10%);
+    }
+
+    &:active {
+      transform: scale(0.98);
+    }
+  }
+}
+
+/* Animaciones */
+@keyframes fadeInDown {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes pulse {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.1);
+  }
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .header {
+    h1 {
+      font-size: 1.3rem;
+    }
+
+    .user-info {
+      h2 {
+        font-size: 1.5rem;
+      }
+
+      .rut {
+        font-size: 1.2rem;
+      }
+    }
+  }
+
+  .comida-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 15px;
+  }
+
+  .comida-card {
+    padding: 25px 15px;
+    min-height: 150px;
+
+    .icon-container {
+      width: 50px;
+      height: 50px;
+    }
+
+    .comida-nombre {
+      font-size: 1.1rem;
+    }
+  }
+
+  .action-footer {
+    flex-direction: column;
+    padding: 15px;
+  }
+
+  .btn-volver {
+    width: 100%;
+  }
+
+  .btn-siguiente {
+    max-width: 100%;
+    font-size: 1.1rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .comida-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .comida-card {
+    padding: 20px;
+    min-height: 130px;
+  }
+}

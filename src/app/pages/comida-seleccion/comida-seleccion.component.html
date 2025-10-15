@@ -1,0 +1,81 @@
+<div class="comida-container">
+  <!-- Header con info del usuario -->
+  <div class="header">
+    <h1>Sistema de Control de Tickets de Casino</h1>
+    <div class="user-info" *ngIf="empleado">
+      <h2>{{ empleado.nombre }}</h2>
+      <p class="rut">{{ empleado.rut }}</p>
+    </div>
+  </div>
+
+  <!-- Grid de opciones de comida -->
+  <div class="comida-grid">
+    <div 
+      *ngFor="let tipo of tiposComida"
+      class="comida-card"
+      [class.disponible]="estaDisponibleParaEmpleado(tipo)"
+      [class.no-disponible]="!estaDisponibleParaEmpleado(tipo)"
+      [class.seleccionado]="seleccionado === tipo.nombre"
+      (click)="seleccionarComida(tipo)"
+    >
+      <!-- Icono -->
+      <div class="icon-container">
+        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M16 3v5h3v13a1 1 0 01-1 1H6a1 1 0 01-1-1V8h3V3h1v5h2V3h1v5h2V3h1v5h1V3h1zm-7 9v7h2v-7H9zm4 0v7h2v-7h-2z" fill="currentColor"/>
+        </svg>
+      </div>
+
+      <!-- Nombre -->
+      <h3 class="comida-nombre">{{ tipo.nombre }}</h3>
+
+      <!-- Check mark si está seleccionado -->
+      <div class="check-mark" *ngIf="seleccionado === tipo.nombre">
+        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z" fill="currentColor"/>
+        </svg>
+      </div>
+    </div>
+  </div>
+
+  <!-- Botón de acción -->
+  <div class="action-footer" *ngIf="!imprimiendo">
+    <button 
+      class="btn-volver"
+      (click)="volver()"
+    >
+      ← Volver
+    </button>
+    
+    <button 
+      class="btn-siguiente"
+      [disabled]="!seleccionado"
+      (click)="confirmarSeleccion()"
+    >
+      SIGUIENTE
+    </button>
+  </div>
+
+  <!-- Estado de impresión -->
+  <div class="printing-overlay" *ngIf="imprimiendo">
+    <div class="printing-content">
+      <!-- Info del usuario -->
+      <h2 class="user-name">{{ empleado?.nombre }}</h2>
+      <p class="user-rut">{{ empleado?.rut }}</p>
+
+      <!-- Icono de impresora -->
+      <div class="printer-icon">
+        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M19 8H5c-1.66 0-3 1.34-3 3v6h4v4h12v-4h4v-6c0-1.66-1.34-3-3-3zm-3 11H8v-5h8v5zm3-7c-.55 0-1-.45-1-1s.45-1 1-1 1 .45 1 1-.45 1-1 1zm-1-9H6v4h12V3z" fill="currentColor"/>
+        </svg>
+      </div>
+
+      <!-- Texto de impresión -->
+      <p class="printing-text">Imprimiendo...</p>
+
+      <!-- Botón de terminar (opcional) -->
+      <button class="btn-terminar" (click)="volverAlInicio()">
+        TERMINAR
+      </button>
+    </div>
+  </div>
+</div>

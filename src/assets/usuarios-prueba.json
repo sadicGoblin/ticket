@@ -1,0 +1,97 @@
+{
+  "usuarios": [
+    {
+      "rut": "12345678-9",
+      "nombre": "JUAN PEREZ L.",
+      "area": "Producción",
+      "turno": "Mañana",
+      "opcionesDisponibles": ["Desayuno", "Almuerzo", "Colación"]
+    },
+    {
+      "rut": "15091233-K",
+      "nombre": "MARIA GONZALEZ S.",
+      "area": "Administración",
+      "turno": "Tarde",
+      "opcionesDisponibles": ["Almuerzo", "Colación"]
+    },
+    {
+      "rut": "20542874-7",
+      "nombre": "PEDRO RODRIGUEZ M.",
+      "area": "Mantención",
+      "turno": "Noche",
+      "opcionesDisponibles": ["Cena", "Nocturna"]
+    },
+    {
+      "rut": "18765432-1",
+      "nombre": "ANA MARTINEZ V.",
+      "area": "Ventas",
+      "turno": "Mañana",
+      "opcionesDisponibles": ["Desayuno", "Almuerzo"]
+    },
+    {
+      "rut": "16543210-9",
+      "nombre": "CARLOS LOPEZ T.",
+      "area": "Logística",
+      "turno": "Tarde",
+      "opcionesDisponibles": ["Almuerzo", "Colación", "Otros"]
+    },
+    {
+      "rut": "11111111-1",
+      "nombre": "SOFIA FERNANDEZ R.",
+      "area": "RRHH",
+      "turno": "Mañana",
+      "opcionesDisponibles": ["Desayuno", "Almuerzo"]
+    },
+    {
+      "rut": "22222222-2",
+      "nombre": "DIEGO SANCHEZ P.",
+      "area": "Calidad",
+      "turno": "Noche",
+      "opcionesDisponibles": ["Cena", "Nocturna", "Otros"]
+    }
+  ],
+  "tiposComida": [
+    {
+      "id": "desayuno",
+      "nombre": "Desayuno",
+      "icono": "utensils",
+      "disponible": true,
+      "horario": "07:00 - 09:00"
+    },
+    {
+      "id": "almuerzo",
+      "nombre": "Almuerzo",
+      "icono": "utensils",
+      "disponible": true,
+      "horario": "12:00 - 14:30"
+    },
+    {
+      "id": "cena",
+      "nombre": "Cena",
+      "icono": "utensils",
+      "disponible": false,
+      "horario": "19:00 - 21:00"
+    },
+    {
+      "id": "colacion",
+      "nombre": "Colación",
+      "icono": "utensils",
+      "disponible": true,
+      "horario": "16:00 - 17:00"
+    },
+    {
+      "id": "nocturna",
+      "nombre": "Nocturna",
+      "icono": "utensils",
+      "disponible": false,
+      "horario": "00:00 - 02:00"
+    },
+    {
+      "id": "otros",
+      "nombre": "Otros",
+      "icono": "utensils",
+      "disponible": false,
+      "horario": "Variable"
+    }
+  ]
+}

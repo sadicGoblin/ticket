@@ -1,0 +1,738 @@
+// Variables de diseño
+$primary-blue: #0046b5;
+$secondary-blue: #003a99;
+$dark-bg: #2c3e50;
+$dark-footer: #333333;
+$light-gray: #ecf0f1;
+$success-green: #27ae60;
+$error-red: #e74c3c;
+$white: #ffffff;
+$button-green: #4caf50;
+
+.verification-container {
+  min-height: 100vh;
+  background: linear-gradient(180deg, $primary-blue 0%, $secondary-blue 100%);
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Badge de estado de impresora */
+.printer-status-badge {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  border-radius: 20px;
+  background: rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(10px);
+  color: $white;
+  font-size: 0.85rem;
+  font-weight: 500;
+  z-index: 100;
+  animation: fadeIn 0.5s ease;
+
+  .status-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: $white;
+  }
+
+  &.online .status-dot {
+    background: $success-green;
+    box-shadow: 0 0 10px rgba($success-green, 0.6);
+  }
+
+  &.offline .status-dot {
+    background: $error-red;
+    box-shadow: 0 0 10px rgba($error-red, 0.6);
+  }
+
+  &.unknown .status-dot {
+    background: rgba($white, 0.5);
+  }
+}
+
+/* Vista principal */
+.main-view {
+  width: 100%;
+  max-width: 800px;
+  animation: fadeInUp 0.6s ease;
+}
+
+/* Header */
+.header {
+  text-align: center;
+  color: $white;
+  margin-bottom: 3rem;
+  animation: fadeInDown 0.6s ease;
+
+  .logo-container {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 1.5rem;
+
+    .logo-icon {
+      width: 60px;
+      height: 60px;
+      color: $white;
+      filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.2));
+    }
+  }
+
+  h1 {
+    font-size: 2rem;
+    margin: 0;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+  }
+}
+
+
+/* Display del RUT */
+.rut-display-container {
+  margin-bottom: 2.5rem;
+  text-align: center;
+}
+
+.rut-display {
+  background: rgba(255, 255, 255, 0.25);
+  backdrop-filter: blur(10px);
+  padding: 20px 40px;
+  border-radius: 12px;
+  font-size: 2.5rem;
+  font-weight: 600;
+  color: $white;
+  letter-spacing: 6px;
+  font-family: 'Courier New', monospace;
+  min-height: 80px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  transition: all 0.3s ease;
+
+  &:not(:empty) {
+    background: rgba(255, 255, 255, 0.35);
+    border-color: rgba(255, 255, 255, 0.5);
+  }
+}
+
+/* Teclado numérico */
+.numpad-container {
+  background: rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(10px);
+  padding: 30px;
+  border-radius: 16px;
+  margin-bottom: 1.5rem;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+}
+
+.numpad-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 15px;
+  margin-bottom: 20px;
+}
+
+.numpad-btn {
+  background: $white;
+  border: none;
+  border-radius: 12px;
+  padding: 25px;
+  font-size: 2rem;
+  font-weight: 700;
+  color: #2c3e50;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  user-select: none;
+
+  &:hover:not(:disabled) {
+    background: lighten($primary-blue, 50%);
+    transform: translateY(-3px);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.25);
+  }
+
+  &:active:not(:disabled) {
+    transform: translateY(-1px);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    background: #e0e0e0;
+  }
+}
+
+.btn-clear {
+  width: 100%;
+  background: rgba(231, 76, 60, 0.9);
+  border: none;
+  border-radius: 12px;
+  padding: 15px;
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: $white;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+
+  svg {
+    width: 24px;
+    height: 24px;
+  }
+
+  &:hover:not(:disabled) {
+    background: rgba(192, 57, 43, 1);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.25);
+  }
+
+  &:active:not(:disabled) {
+    transform: translateY(0);
+  }
+
+  &:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+  }
+}
+
+
+/* Spinner */
+.spinner {
+  width: 20px;
+  height: 20px;
+  border: 3px solid rgba(255, 255, 255, 0.3);
+  border-top-color: white;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* Mensajes de error */
+.error-message {
+  margin-top: 1.5rem;
+  padding: 16px 20px;
+  background: rgba(231, 76, 60, 0.95);
+  border-radius: 12px;
+  color: $white;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-weight: 500;
+  font-size: 1rem;
+  animation: shake 0.5s ease;
+  box-shadow: 0 4px 12px rgba(231, 76, 60, 0.3);
+
+  .error-icon {
+    width: 24px;
+    height: 24px;
+    flex-shrink: 0;
+  }
+}
+
+/* Link a credenciales */
+.alternative-access {
+  text-align: center;
+  margin: 1.5rem 0;
+  
+  .link-credential {
+    color: $white;
+    text-decoration: underline;
+    font-size: 1rem;
+    font-weight: 500;
+    opacity: 0.9;
+    transition: opacity 0.3s ease;
+    
+    &:hover {
+      opacity: 1;
+    }
+  }
+}
+
+/* Contenedor de acción */
+.action-container {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: $dark-footer;
+  padding: 20px;
+  box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.3);
+  z-index: 50;
+}
+
+.btn-siguiente {
+  width: 100%;
+  max-width: 800px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 18px;
+  font-size: 1.3rem;
+  font-weight: 700;
+  border: none;
+  border-radius: 8px;
+  background: $button-green;
+  color: $white;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+
+  &:hover:not(:disabled) {
+    background: darken($button-green, 10%);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.4);
+  }
+
+  &:active:not(:disabled) {
+    transform: translateY(0);
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    background: #666;
+  }
+
+  &.loading {
+    pointer-events: none;
+  }
+}
+
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-10px); }
+  75% { transform: translateX(10px); }
+}
+
+/* Vista de resultado */
+.result-view {
+  width: 100%;
+  max-width: 700px;
+  padding: 20px;
+  padding-bottom: 100px;
+  animation: fadeInUp 0.6s ease;
+}
+
+.success-card {
+  background: $white;
+  padding: 2.5rem;
+  border-radius: 20px;
+  box-shadow: 0 8px 40px rgba(0, 0, 0, 0.3);
+}
+
+.success-header {
+  text-align: center;
+  margin-bottom: 2rem;
+
+  .success-icon {
+    width: 80px;
+    height: 80px;
+    margin: 0 auto 1.5rem;
+    color: $success-green;
+    animation: bounce 1s ease infinite;
+  }
+
+  h2 {
+    color: $success-green;
+    font-size: 2rem;
+    margin: 0;
+    font-weight: 700;
+  }
+}
+
+.employee-info {
+  background: $light-gray;
+  padding: 1.5rem;
+  border-radius: 12px;
+  margin-bottom: 1.5rem;
+}
+
+.info-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 14px 0;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+
+  &:last-child {
+    border-bottom: none;
+  }
+
+  &.highlight {
+    background: rgba($primary-blue, 0.08);
+    margin: 0 -1.5rem;
+    padding: 14px 1.5rem;
+    border-radius: 8px;
+
+    .info-value {
+      color: $primary-blue;
+      font-weight: 700;
+      font-size: 1.15rem;
+    }
+  }
+
+  .info-label {
+    font-weight: 600;
+    color: #666;
+    font-size: 0.95rem;
+  }
+
+  .info-value {
+    font-weight: 600;
+    color: #2c3e50;
+    text-align: right;
+    font-size: 1rem;
+  }
+}
+
+/* Estados de impresión */
+.print-status {
+  margin: 2rem 0;
+  text-align: center;
+
+  &.printing {
+    .print-icon {
+      width: 60px;
+      height: 60px;
+      margin: 0 auto 1rem;
+      color: $primary-blue;
+      animation: pulse 1.5s ease infinite;
+    }
+
+    .print-message {
+      font-size: 1.2rem;
+      font-weight: 600;
+      color: $primary-blue;
+      margin: 0.5rem 0;
+    }
+  }
+
+  &.success {
+    .print-icon {
+      width: 70px;
+      height: 70px;
+      margin: 0 auto 1rem;
+      color: $success-green;
+    }
+
+    .print-message {
+      font-size: 1.3rem;
+      font-weight: 700;
+      color: $success-green;
+      margin: 0.5rem 0;
+    }
+
+    .print-submessage {
+      font-size: 1rem;
+      color: #666;
+      font-weight: 500;
+      margin-top: 0.8rem;
+    }
+  }
+}
+
+.progress-bar {
+  width: 100%;
+  max-width: 300px;
+  height: 6px;
+  background: #e0e0e0;
+  border-radius: 10px;
+  overflow: hidden;
+  margin: 1rem auto 0;
+}
+
+.progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, $primary-blue, $secondary-blue);
+  border-radius: 10px;
+  animation: progress 2s ease infinite;
+}
+
+/* Botones de acción en resultado */
+.result-actions {
+  margin-top: 2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.btn-action {
+  width: 100%;
+  padding: 14px;
+  font-size: 1.05rem;
+  font-weight: 600;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  border: none;
+
+  &.btn-primary {
+    background: $primary-blue;
+    color: $white;
+    box-shadow: 0 4px 12px rgba($primary-blue, 0.3);
+
+    &:hover {
+      background: darken($primary-blue, 10%);
+      transform: translateY(-2px);
+      box-shadow: 0 6px 16px rgba($primary-blue, 0.4);
+    }
+  }
+
+  &.btn-retry {
+    background: rgba($primary-blue, 0.1);
+    color: $primary-blue;
+    border: 2px solid $primary-blue;
+
+    &:hover {
+      background: $primary-blue;
+      color: $white;
+      transform: translateY(-2px);
+    }
+  }
+}
+
+
+/* Indicador de inactividad */
+.inactivity-indicator {
+  position: fixed;
+  bottom: 90px;
+  right: 20px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 16px;
+  background: rgba(255, 152, 0, 0.95);
+  color: $white;
+  border-radius: 20px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  animation: pulse 1s ease infinite;
+  z-index: 100;
+
+  svg {
+    width: 20px;
+    height: 20px;
+  }
+}
+
+/* Animaciones */
+@keyframes fadeInDown {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes bounce {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+@keyframes pulse {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.05);
+    opacity: 0.9;
+  }
+}
+
+@keyframes progress {
+  0% {
+    width: 0%;
+  }
+  50% {
+    width: 70%;
+  }
+  100% {
+    width: 100%;
+  }
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .verification-container {
+    padding: 10px;
+  }
+
+  .header {
+    margin-bottom: 2rem;
+
+    .logo-icon {
+      width: 50px;
+      height: 50px;
+    }
+
+    h1 {
+      font-size: 1.5rem;
+    }
+  }
+
+  .printer-status-badge {
+    top: 10px;
+    right: 10px;
+    font-size: 0.75rem;
+    padding: 6px 12px;
+  }
+
+  .rut-display {
+    font-size: 1.8rem;
+    padding: 15px 25px;
+    letter-spacing: 3px;
+    min-height: 65px;
+  }
+
+  .numpad-container {
+    padding: 20px;
+  }
+
+  .numpad-grid {
+    gap: 12px;
+  }
+
+  .numpad-btn {
+    padding: 20px;
+    font-size: 1.6rem;
+  }
+
+  .btn-clear {
+    padding: 12px;
+    font-size: 1rem;
+
+    svg {
+      width: 20px;
+      height: 20px;
+    }
+  }
+
+  .btn-siguiente {
+    font-size: 1.1rem;
+    padding: 16px;
+  }
+
+  .result-view {
+    padding: 15px;
+    padding-bottom: 90px;
+  }
+
+  .success-card {
+    padding: 1.5rem;
+  }
+
+  .success-header {
+    .success-icon {
+      width: 60px;
+      height: 60px;
+    }
+
+    h2 {
+      font-size: 1.5rem;
+    }
+  }
+
+  .info-item {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 5px;
+    padding: 12px 0;
+
+    .info-value {
+      text-align: left;
+      font-size: 1.05rem;
+    }
+
+    &.highlight .info-value {
+      font-size: 1.2rem;
+    }
+  }
+
+  .action-container {
+    padding: 15px;
+  }
+
+  .inactivity-indicator {
+    bottom: 75px;
+    right: 10px;
+    font-size: 0.8rem;
+    padding: 8px 12px;
+
+    svg {
+      width: 18px;
+      height: 18px;
+    }
+  }
+}
+
+@media (max-width: 480px) {
+  .header h1 {
+    font-size: 1.2rem;
+  }
+
+  .rut-display {
+    font-size: 1.5rem;
+    letter-spacing: 2px;
+  }
+
+  .numpad-btn {
+    padding: 15px;
+    font-size: 1.4rem;
+  }
+}
