@@ -1,9 +1,11 @@
 from flask import Flask, request, jsonify
+from flask_cors import CORS
 from datetime import datetime
 import win32print
 import win32api
 
 app = Flask(__name__)
+CORS(app)  # Habilitar CORS para todas las rutas
 
 def enviar_a_impresora(nombre_impresora, datos):
     try:
@@ -58,10 +60,34 @@ def generar_ticket(pedido):
     rut_cliente = pedido.get("rut", "No especificado")
     ticket += izquierda(f"RUT: {rut_cliente}").encode("cp437") + NL
     
-    nombre_cliente = pedido.get("nombre", "No especificado")
+    # Nombre puede venir como 'nombre' o 'nombreCliente'
+    nombre_cliente = pedido.get("nombre") or pedido.get("nombreCliente", "No especificado")
     ticket += izquierda(f"Nombre: {nombre_cliente}").encode("cp437") + NL
     
     ticket += NL
+    
+    # Extraer selección desde productos o desde el campo directo
+    seleccion = pedido.get("seleccion", "")
+    para_llevar = pedido.get("paraLlevar", False)
+    
+    # Si no viene seleccion directa, extraer desde productos
+    if not seleccion:
+        productos = pedido.get("productos", [])
+        if productos and len(productos) > 0:
+            nombre_producto = productos[0].get("nombre", "")
+            # Extraer tipo de comida del nombre del producto
+            if "Almuerzo" in nombre_producto:
+                seleccion = "almuerzo"
+            elif "Desayuno" in nombre_producto:
+                seleccion = "desayuno"
+            elif "Cena" in nombre_producto:
+                seleccion = "cena"
+            else:
+                seleccion = nombre_producto
+            
+            # Extraer si es para llevar desde el nombre del producto
+            if "Para Llevar" in nombre_producto:
+                para_llevar = True
     
     # Selección
     ticket += b'\x1b\x45\x01'  # Negrita
@@ -69,25 +95,29 @@ def generar_ticket(pedido):
     ticket += b'\x1b\x45\x00'  # Fin negrita
     ticket += ("-" * WIDTH).encode("cp437") + NL
     
-    seleccion = pedido.get("seleccion", "No especificado")
     if seleccion.lower() == "desayuno":
         ticket += izquierda("[ X ] Desayuno").encode("cp437") + NL
         ticket += izquierda("[   ] Almuerzo").encode("cp437") + NL
+        ticket += izquierda("[   ] Cena").encode("cp437") + NL
     elif seleccion.lower() == "almuerzo":
         ticket += izquierda("[   ] Desayuno").encode("cp437") + NL
         ticket += izquierda("[ X ] Almuerzo").encode("cp437") + NL
+        ticket += izquierda("[   ] Cena").encode("cp437") + NL
+    elif seleccion.lower() == "cena":
+        ticket += izquierda("[   ] Desayuno").encode("cp437") + NL
+        ticket += izquierda("[   ] Almuerzo").encode("cp437") + NL
+        ticket += izquierda("[ X ] Cena").encode("cp437") + NL
     else:
-        ticket += izquierda(f"Seleccion: {seleccion}").encode("cp437") + NL
+        ticket += izquierda(f"Tipo: {seleccion}").encode("cp437") + NL
     
     ticket += NL
     
     # Para llevar
-    para_llevar = pedido.get("paraLlevar", False)
     ticket += b'\x1b\x45\x01'  # Negrita
     if para_llevar:
         ticket += centrar("*** PARA LLEVAR ***").encode("cp437") + NL
     else:
-        ticket += centrar("*** PARA CONSUMIR AQUI ***").encode("cp437") + NL
+        ticket += centrar("*** PARA SERVIR ***").encode("cp437") + NL
     ticket += b'\x1b\x45\x00'  # Fin negrita
     
     ticket += NL
