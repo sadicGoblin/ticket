@@ -4,13 +4,14 @@ import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { CasinoService, EmpleadoCasino } from '../../services/casino.service';
 import { PrinterService } from '../../services/printer.service';
+import { ConfigService } from '../../services/config.service';
 
 @Component({
   selector: 'app-rut-verification',
   standalone: true,
   imports: [CommonModule, FormsModule],
   templateUrl: './rut-verification.component.html',
-  styleUrl: './rut-verification.component.scss'
+  styleUrl: './rut-verification.component.scss',
 })
 export class RutVerificationComponent implements OnDestroy {
   rut: string = '';
@@ -21,6 +22,7 @@ export class RutVerificationComponent implements OnDestroy {
   ticketImpreso: boolean = false;
   imprimiendo: boolean = false;
   printerStatus: 'unknown' | 'online' | 'offline' = 'unknown';
+  flujoActual: string = '';
 
   // Gestión de inactividad
   private inactivityTimeout: any = null;
@@ -29,11 +31,19 @@ export class RutVerificationComponent implements OnDestroy {
   tiempoRestante: number = 60;
   showInactivityTimer: boolean = false; // Cambiar a true para mostrar el contador
 
+  brandName = '';
+  logoUrl: string | null = null;
+
   constructor(
     public casinoService: CasinoService,
     private printerService: PrinterService,
-    private router: Router
+    private router: Router,
+    private configService: ConfigService,
   ) {
+    this.brandName = this.configService.currentConfig.brand.name;
+    this.logoUrl = this.configService.orgLogoUrl;
+    // Leer flujo actual desde sessionStorage
+    this.flujoActual = sessionStorage.getItem('flujoActual') || '';
     // Verificar estado de la impresora al iniciar
     this.verificarImpresora();
     // Iniciar el timer de inactividad
@@ -56,8 +66,10 @@ export class RutVerificationComponent implements OnDestroy {
       },
       error: () => {
         this.printerStatus = 'offline';
-        console.warn('⚠️ Impresora no conectada - Los tickets no se imprimirán');
-      }
+        console.warn(
+          '⚠️ Impresora no conectada - Los tickets no se imprimirán',
+        );
+      },
     });
   }
 
@@ -145,7 +157,7 @@ export class RutVerificationComponent implements OnDestroy {
 
     // Intentar formatear automáticamente
     const cleaned = this.rut.replace(/[^\dkK]/g, '');
-    
+
     if (cleaned.length >= 2) {
       this.rutFormateado = this.casinoService.formatearRut(cleaned);
     } else {
@@ -159,7 +171,7 @@ export class RutVerificationComponent implements OnDestroy {
   onRutInput(): void {
     // Limpiar caracteres no válidos
     let cleaned = this.rut.replace(/[^\dkK]/g, '');
-    
+
     // Limitar longitud
     if (cleaned.length > 9) {
       cleaned = cleaned.substring(0, 9);
@@ -212,19 +224,41 @@ export class RutVerificationComponent implements OnDestroy {
 
         if (respuesta.success && respuesta.empleado) {
           // Guardar datos del empleado en el servicio para acceso global
-          sessionStorage.setItem('empleadoActual', JSON.stringify(respuesta.empleado));
-          
-          // Navegar a la vista de selección de tipo de servicio
-          this.router.navigate(['/servicio-seleccion']);
+          sessionStorage.setItem(
+            'empleadoActual',
+            JSON.stringify(respuesta.empleado),
+          );
+
+          // Navegar según el flujo seleccionado
+          const flujo = sessionStorage.getItem('flujoActual') || 'ticket';
+          if (flujo === 'ticket') {
+            // Guardar primer evento y pasar directo a selección de servicio
+            if (
+              respuesta.empleado.eventos &&
+              respuesta.empleado.eventos.length > 0
+            ) {
+              sessionStorage.setItem(
+                'eventoActual',
+                JSON.stringify(respuesta.empleado.eventos[0]),
+              );
+            }
+            this.router.navigate(['/comida-seleccion']);
+          } else {
+            // Flujo de registro de asistencia - confirmar y volver
+            this.empleado = respuesta.empleado;
+            return;
+          }
         } else {
-          this.errorMensaje = respuesta.mensaje || 'No se pudo verificar el RUT';
+          this.errorMensaje =
+            respuesta.mensaje || 'No se pudo verificar el RUT';
         }
       },
       error: (error) => {
         this.verificando = false;
-        this.errorMensaje = 'Error al conectar con el servidor. Intente nuevamente';
+        this.errorMensaje =
+          'Error al conectar con el servidor. Intente nuevamente';
         console.error('Error en verificación:', error);
-      }
+      },
     });
   }
 
@@ -239,46 +273,48 @@ export class RutVerificationComponent implements OnDestroy {
     this.errorMensaje = '';
 
     const nombreTicket = tipoComida || 'Comida';
-    const productos = [{
-      nombre: `Ticket de ${nombreTicket}`,
-      cantidad: 1,
-      precio: 0
-    }];
+    const productos = [
+      {
+        nombre: `Ticket de ${nombreTicket}`,
+        cantidad: 1,
+        precio: 0,
+      },
+    ];
 
     const numeroPedido = `CASINO-${new Date().getTime()}`;
 
-    this.printerService.imprimirTicket(
-      productos,
-      undefined,
-      numeroPedido,
-      this.empleado.rut,
-      this.empleado.nombre
-    ).subscribe({
-      next: (respuesta) => {
-        this.imprimiendo = false;
+    this.printerService
+      .imprimirTicket(
+        productos,
+        undefined,
+        numeroPedido,
+        this.empleado.rut,
+        this.empleado.nombre,
+      )
+      .subscribe({
+        next: (respuesta) => {
+          this.imprimiendo = false;
 
-        if (respuesta.resultado === 'ok') {
-          console.log('✅ Ticket impreso exitosamente');
-          this.ticketImpreso = true;
-          
-          // Marcar ticket como utilizado
-          this.casinoService.marcarTicketUtilizado(this.empleado!.rut).subscribe();
+          if (respuesta.resultado === 'ok') {
+            console.log('✅ Ticket impreso exitosamente');
+            this.ticketImpreso = true;
 
-          // Resetear después de 5 segundos
-          setTimeout(() => {
-            this.resetearFormulario();
-          }, 5000);
-        } else {
-          this.errorMensaje = `Error al imprimir: ${respuesta.mensaje}`;
-          console.error('❌ Error en impresión:', respuesta.mensaje);
-        }
-      },
-      error: (error) => {
-        this.imprimiendo = false;
-        this.errorMensaje = 'No se pudo conectar con la impresora. Verifique la conexión';
-        console.error('❌ Error de conexión con impresora:', error);
-      }
-    });
+            // Resetear después de 5 segundos
+            setTimeout(() => {
+              this.resetearFormulario();
+            }, 5000);
+          } else {
+            this.errorMensaje = `Error al imprimir: ${respuesta.mensaje}`;
+            console.error('❌ Error en impresión:', respuesta.mensaje);
+          }
+        },
+        error: (error) => {
+          this.imprimiendo = false;
+          this.errorMensaje =
+            'No se pudo conectar con la impresora. Verifique la conexión';
+          console.error('❌ Error de conexión con impresora:', error);
+        },
+      });
   }
 
   /**
@@ -291,8 +327,19 @@ export class RutVerificationComponent implements OnDestroy {
     this.errorMensaje = '';
     this.ticketImpreso = false;
     this.imprimiendo = false;
-    // Reiniciar timer de inactividad
-    this.resetInactivityTimer();
+    this.clearInactivityTimer();
+    // Volver al inicio (home)
+    this.router.navigate(['/home']);
+  }
+
+  /**
+   * Volver al menu principal
+   */
+  volverAlMenu(): void {
+    this.clearInactivityTimer();
+    sessionStorage.removeItem('empleadoActual');
+    sessionStorage.removeItem('flujoActual');
+    this.router.navigate(['/home']);
   }
 
   /**

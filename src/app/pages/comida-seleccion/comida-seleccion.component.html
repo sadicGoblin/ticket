@@ -1,81 +1,183 @@
 <div class="comida-container">
-  <!-- Header con info del usuario -->
-  <div class="header">
-    <h1>Sistema de Control de Tickets de Casino</h1>
-    <div class="user-info" *ngIf="empleado">
-      <h2>{{ empleado.nombre }}</h2>
-      <p class="rut">{{ empleado.rut }}</p>
+  <!-- Top Bar -->
+  <div class="top-bar">
+    <div class="top-bar-inner">
+      <div class="brand">
+        <img
+          *ngIf="logoUrl"
+          class="brand-logo"
+          [src]="logoUrl"
+          [alt]="brandName"
+        />
+        <span class="brand-text">{{ brandName }}</span>
+      </div>
+      <button class="btn-back" (click)="volver()">
+        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path
+            d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"
+            fill="currentColor"
+          />
+        </svg>
+        Volver
+      </button>
     </div>
   </div>
 
-  <!-- Grid de opciones de comida -->
-  <div class="comida-grid">
-    <div 
-      *ngFor="let tipo of tiposComida"
-      class="comida-card"
-      [class.disponible]="estaDisponibleParaEmpleado(tipo)"
-      [class.no-disponible]="!estaDisponibleParaEmpleado(tipo)"
-      [class.seleccionado]="seleccionado === tipo.nombre"
-      (click)="seleccionarComida(tipo)"
-    >
-      <!-- Icono -->
-      <div class="icon-container">
+  <!-- Contenido principal -->
+  <div class="main-content" *ngIf="!imprimiendo">
+    <!-- Info del usuario -->
+    <div class="user-badge" *ngIf="empleado">
+      <div class="user-avatar">
         <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <path d="M16 3v5h3v13a1 1 0 01-1 1H6a1 1 0 01-1-1V8h3V3h1v5h2V3h1v5h2V3h1v5h1V3h1zm-7 9v7h2v-7H9zm4 0v7h2v-7h-2z" fill="currentColor"/>
+          <path
+            d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"
+            fill="currentColor"
+          />
         </svg>
       </div>
-
-      <!-- Nombre -->
-      <h3 class="comida-nombre">{{ tipo.nombre }}</h3>
-
-      <!-- Check mark si está seleccionado -->
-      <div class="check-mark" *ngIf="seleccionado === tipo.nombre">
-        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z" fill="currentColor"/>
-        </svg>
+      <div class="user-details">
+        <span class="user-name">{{ empleado.nombre }}</span>
+        <span class="user-rut">{{ empleado.rut }}</span>
       </div>
+    </div>
+
+    <!-- Titulo -->
+    <div class="section-header">
+      <h2 class="section-title">Seleccione su servicio</h2>
+      <p class="section-desc">Elija una de las opciones disponibles</p>
+    </div>
+
+    <!-- Grid de opciones de comida -->
+    <div class="comida-grid">
+      <button
+        *ngFor="let servicio of servicios"
+        class="comida-card"
+        [class.disponible]="
+          servicio.disponible && servicio.estadoHorario === 'disponible'
+        "
+        [class.no-disponible]="!servicio.disponible"
+        [class.proximamente]="servicio.estadoHorario === 'proximamente'"
+        [class.finalizado]="servicio.estadoHorario === 'finalizado'"
+        [class.seleccionado]="seleccionado?.id === servicio.id"
+        (click)="seleccionarComida(servicio)"
+      >
+        <!-- Check mark -->
+        <div class="check-mark" *ngIf="seleccionado?.id === servicio.id">
+          <svg
+            viewBox="0 0 24 24"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"
+              fill="currentColor"
+            />
+          </svg>
+        </div>
+
+        <!-- Icono del servicio (desde API o fallback) -->
+        <div class="icon-container">
+          <img
+            *ngIf="servicio.iconUrl"
+            [src]="'http://192.168.100.10:8051' + servicio.iconUrl"
+            [alt]="servicio.nombre"
+            class="service-icon-img"
+          />
+          <svg
+            *ngIf="!servicio.iconUrl"
+            viewBox="0 0 24 24"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              d="M11 9H9V2H7v7H5V2H3v7c0 2.12 1.66 3.84 3.75 3.97V22h2.5v-9.03C11.34 12.84 13 11.12 13 9V2h-2v7zm5-3v8h2.5v8H21V2c-2.76 0-5 2.24-5 4z"
+              fill="currentColor"
+            />
+          </svg>
+        </div>
+
+        <!-- Nombre -->
+        <span class="comida-nombre">{{ servicio.nombre }}</span>
+
+        <!-- Horario -->
+        <span
+          class="comida-horario-rango"
+          *ngIf="servicio.timeFrom && servicio.timeTo"
+        >
+          {{ formatHora(servicio.timeFrom) }} -
+          {{ formatHora(servicio.timeTo) }}
+        </span>
+
+        <!-- Estado -->
+        <span class="comida-estado" [ngClass]="servicio.estadoHorario">
+          <ng-container *ngIf="!servicio.disponible">No asignado</ng-container>
+          <ng-container
+            *ngIf="
+              servicio.disponible && servicio.estadoHorario === 'disponible'
+            "
+          >
+            Disponible ahora
+          </ng-container>
+          <ng-container
+            *ngIf="
+              servicio.disponible && servicio.estadoHorario === 'proximamente'
+            "
+          >
+            Disponible en
+            {{
+              casinoService.formatearTiempoRestante(servicio.segundosParaAbrir)
+            }}
+          </ng-container>
+          <ng-container
+            *ngIf="
+              servicio.disponible && servicio.estadoHorario === 'finalizado'
+            "
+          >
+            Horario finalizado
+          </ng-container>
+        </span>
+      </button>
     </div>
   </div>
 
-  <!-- Botón de acción -->
+  <!-- Botón de acción fijo -->
   <div class="action-footer" *ngIf="!imprimiendo">
-    <button 
-      class="btn-volver"
-      (click)="volver()"
-    >
-      ← Volver
-    </button>
-    
-    <button 
-      class="btn-siguiente"
+    <button
+      class="btn-confirmar"
       [disabled]="!seleccionado"
       (click)="confirmarSeleccion()"
     >
-      SIGUIENTE
+      CONFIRMAR SELECCION
     </button>
   </div>
 
   <!-- Estado de impresión -->
   <div class="printing-overlay" *ngIf="imprimiendo">
     <div class="printing-content">
-      <!-- Info del usuario -->
-      <h2 class="user-name">{{ empleado?.nombre }}</h2>
-      <p class="user-rut">{{ empleado?.rut }}</p>
-
-      <!-- Icono de impresora -->
-      <div class="printer-icon">
-        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <path d="M19 8H5c-1.66 0-3 1.34-3 3v6h4v4h12v-4h4v-6c0-1.66-1.34-3-3-3zm-3 11H8v-5h8v5zm3-7c-.55 0-1-.45-1-1s.45-1 1-1 1 .45 1 1-.45 1-1 1zm-1-9H6v4h12V3z" fill="currentColor"/>
+      <div class="printing-icon-wrap">
+        <svg
+          class="printing-icon"
+          viewBox="0 0 24 24"
+          fill="none"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <path
+            d="M19 8H5c-1.66 0-3 1.34-3 3v6h4v4h12v-4h4v-6c0-1.66-1.34-3-3-3zm-3 11H8v-5h8v5zm3-7c-.55 0-1-.45-1-1s.45-1 1-1 1 .45 1 1-.45 1-1 1zm-1-9H6v4h12V3z"
+            fill="currentColor"
+          />
         </svg>
       </div>
 
-      <!-- Texto de impresión -->
-      <p class="printing-text">Imprimiendo...</p>
+      <h2 class="printing-title">Imprimiendo ticket</h2>
+      <p class="printing-subtitle">{{ empleado?.nombre }}</p>
 
-      <!-- Botón de terminar (opcional) -->
-      <button class="btn-terminar" (click)="volverAlInicio()">
-        TERMINAR
-      </button>
+      <div class="progress-bar">
+        <div class="progress-fill"></div>
+      </div>
+
+      <p class="printing-hint">Por favor espere...</p>
+
+      <button class="btn-terminar" (click)="volverAlInicio()">TERMINAR</button>
     </div>
   </div>
 </div>

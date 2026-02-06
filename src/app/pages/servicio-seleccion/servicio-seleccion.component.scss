@@ -1,171 +1,247 @@
-// Variables
-$primary-dark: #2c3e50;
-$secondary-dark: #34495e;
-$blue-action: #3498db;
-$green-action: #4caf50;
-$white: #ffffff;
-$light-gray: #ecf0f1;
+// Design System - Uses CSS custom properties from :root (configurable via API)
 
 .servicio-container {
   min-height: 100vh;
-  background: $primary-dark;
-  padding: 20px;
+  background: var(--wm-gray-50);
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  font-family:
+    "Inter",
+    -apple-system,
+    BlinkMacSystemFont,
+    sans-serif;
   position: relative;
 }
 
-/* Header */
-.header {
-  text-align: center;
-  color: rgba($white, 0.6);
-  margin-bottom: 3rem;
-  animation: fadeInDown 0.6s ease;
+/* Top Bar */
+.top-bar {
+  width: 100%;
+  background: var(--wm-blue);
+  padding: 0 48px;
+  z-index: 100;
 
-  h1 {
-    font-size: 1.8rem;
-    margin-bottom: 2rem;
-    font-weight: 600;
-    letter-spacing: 0.5px;
-  }
-
-  .user-info {
-    h2 {
-      color: $white;
-      font-size: 2rem;
-      font-weight: 700;
-      margin: 0 0 0.5rem 0;
-      text-transform: uppercase;
-      letter-spacing: 1px;
-    }
-
-    .rut {
-      color: rgba($white, 0.8);
-      font-size: 1.5rem;
-      font-weight: 600;
-      margin: 0;
-      font-family: 'Courier New', monospace;
-      letter-spacing: 2px;
-    }
+  .top-bar-inner {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 80px;
   }
 }
 
-/* Tarjeta de pregunta */
-.question-card {
-  background: $white;
-  padding: 40px 60px;
-  border-radius: 16px;
-  margin-bottom: 2.5rem;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
-  animation: fadeInUp 0.6s ease;
-
-  .question-text {
-    font-size: 1.6rem;
-    font-weight: 600;
-    color: #2c3e50;
-    margin: 0;
-    text-align: center;
-    line-height: 1.6;
-  }
-}
-
-/* Contenedor de botones */
-.buttons-container {
-  display: flex;
-  gap: 20px;
-  margin-bottom: 3rem;
-  animation: fadeInUp 0.7s ease;
-}
-
-.btn-option {
-  padding: 20px 60px;
-  font-size: 1.5rem;
-  font-weight: 700;
-  border: none;
-  border-radius: 12px;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  text-transform: uppercase;
-  letter-spacing: 1px;
-  min-width: 180px;
+.brand {
   display: flex;
   align-items: center;
-  justify-content: center;
-  gap: 10px;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+  gap: 16px;
+
+  .brand-logo {
+    height: 44px;
+    width: auto;
+    object-fit: contain;
+  }
+
+  .brand-text {
+    color: var(--wm-white);
+    font-size: 2rem;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+  }
+}
+
+.btn-back {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(255, 255, 255, 0.15);
+  border: none;
+  border-radius: 8px;
+  color: var(--wm-white);
+  padding: 10px 20px;
+  font-size: 1rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-family: "Inter", sans-serif;
+
+  svg {
+    width: 18px;
+    height: 18px;
+  }
 
   &:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 6px 24px rgba(0, 0, 0, 0.3);
+    background: rgba(255, 255, 255, 0.25);
+  }
+}
+
+/* Main Content */
+.main-content {
+  width: 100%;
+  max-width: 700px;
+  padding: 48px 32px;
+  animation: fadeInUp 0.4s ease;
+}
+
+/* User Badge */
+.user-badge {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  background: var(--wm-white);
+  padding: 20px 24px;
+  border-radius: 14px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+  margin-bottom: 40px;
+  border: 1px solid var(--wm-gray-200);
+
+  .user-avatar {
+    width: 52px;
+    height: 52px;
+    background: rgba(var(--wm-blue-rgb), 0.08);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+
+    svg {
+      width: 28px;
+      height: 28px;
+      color: var(--wm-blue);
+    }
+  }
+
+  .user-details {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    min-width: 0;
+
+    .user-name {
+      font-weight: 600;
+      color: var(--wm-gray-900);
+      font-size: 1.2rem;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .user-rut {
+      font-size: 0.95rem;
+      color: var(--wm-gray-500);
+      font-weight: 500;
+      font-family: "Inter", monospace;
+      letter-spacing: 0.5px;
+    }
+  }
+}
+
+/* Question Section */
+.question-section {
+  margin-bottom: 24px;
+
+  .question-title {
+    font-size: 2.2rem;
+    font-weight: 700;
+    color: var(--wm-gray-900);
+    margin: 0 0 10px;
+    letter-spacing: -0.02em;
+  }
+
+  .question-text {
+    font-size: 1.15rem;
+    color: var(--wm-gray-500);
+    margin: 0;
+    line-height: 1.5;
+  }
+}
+
+/* Options */
+.options-container {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.option-card {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  background: var(--wm-white);
+  border: 2px solid var(--wm-gray-200);
+  border-radius: 18px;
+  padding: 32px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-align: left;
+  font-family: "Inter", sans-serif;
+
+  &:hover {
+    border-color: var(--wm-blue);
+    background: rgba(var(--wm-blue-rgb), 0.02);
+    box-shadow: 0 2px 12px rgba(var(--wm-blue-rgb), 0.1);
   }
 
   &:active {
-    transform: translateY(-1px);
-  }
-}
-
-.btn-si {
-  background: $blue-action;
-  color: $white;
-
-  &:hover {
-    background: darken($blue-action, 10%);
-  }
-}
-
-.btn-omitir {
-  background: $green-action;
-  color: $white;
-
-  .arrow-icon {
-    width: 24px;
-    height: 24px;
-    stroke: $white;
+    transform: scale(0.98);
+    background: rgba(var(--wm-blue-rgb), 0.05);
   }
 
-  &:hover {
-    background: darken($green-action, 10%);
-  }
-}
+  .option-icon {
+    width: 64px;
+    height: 64px;
+    background: rgba(var(--wm-blue-rgb), 0.08);
+    border-radius: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
 
-/* Link alternativo */
-.alternative-access {
-  text-align: center;
-  animation: fadeIn 0.8s ease;
-  
-  .link-credential {
-    color: rgba($white, 0.7);
-    text-decoration: underline;
-    font-size: 1rem;
-    font-weight: 500;
-    transition: color 0.3s ease;
-    cursor: pointer;
-    
-    &:hover {
-      color: $white;
+    svg {
+      width: 34px;
+      height: 34px;
+      color: var(--wm-blue);
     }
+  }
+
+  .option-text {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+
+    .option-label {
+      font-size: 1.4rem;
+      font-weight: 600;
+      color: var(--wm-gray-900);
+    }
+
+    .option-desc {
+      font-size: 1rem;
+      color: var(--wm-gray-400);
+      font-weight: 400;
+    }
+  }
+
+  .option-arrow {
+    width: 28px;
+    height: 28px;
+    color: var(--wm-gray-400);
+    flex-shrink: 0;
+    transition: color 0.2s ease;
+  }
+
+  &:hover .option-arrow {
+    color: var(--wm-blue);
   }
 }
 
 /* Animaciones */
-@keyframes fadeInDown {
-  from {
-    opacity: 0;
-    transform: translateY(-20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
 @keyframes fadeInUp {
   from {
     opacity: 0;
-    transform: translateY(20px);
+    transform: translateY(16px);
   }
   to {
     opacity: 1;
@@ -184,53 +260,25 @@ $light-gray: #ecf0f1;
 
 /* Responsive */
 @media (max-width: 768px) {
-  .header {
-    h1 {
-      font-size: 1.3rem;
-    }
-
-    .user-info {
-      h2 {
-        font-size: 1.5rem;
-      }
-
-      .rut {
-        font-size: 1.2rem;
-      }
-    }
+  .main-content {
+    padding: 24px 16px;
   }
 
-  .question-card {
-    padding: 30px 40px;
-
-    .question-text {
-      font-size: 1.3rem;
-    }
+  .question-section .question-title {
+    font-size: 1.3rem;
   }
 
-  .buttons-container {
-    flex-direction: column;
-    width: 100%;
-    max-width: 350px;
-  }
-
-  .btn-option {
-    width: 100%;
-    min-width: auto;
+  .option-card {
+    padding: 16px;
   }
 }
 
 @media (max-width: 480px) {
-  .question-card {
-    padding: 20px 30px;
-
-    .question-text {
-      font-size: 1.1rem;
-    }
+  .top-bar .top-bar-inner {
+    height: 56px;
   }
 
-  .btn-option {
-    padding: 16px 40px;
+  .brand .brand-text {
     font-size: 1.2rem;
   }
 }

@@ -1,59 +1,158 @@
-// Variables
-$primary-blue: #0046b5;
-$secondary-blue: #003a99;
-$green-action: #4caf50;
-$white: #ffffff;
-$light-gray: #ecf0f1;
-$disabled-gray: #bdc3c7;
-$card-border: #3498db;
+// Design System - Uses CSS custom properties from :root (configurable via API)
 
 .comida-container {
   min-height: 100vh;
-  background: linear-gradient(180deg, $primary-blue 0%, $secondary-blue 100%);
-  padding: 20px 20px 120px 20px;
+  background: var(--wm-gray-50);
   display: flex;
   flex-direction: column;
   align-items: center;
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  font-family:
+    "Inter",
+    -apple-system,
+    BlinkMacSystemFont,
+    sans-serif;
   position: relative;
 }
 
-/* Header */
-.header {
-  text-align: center;
-  color: $white;
-  margin-bottom: 2.5rem;
-  animation: fadeInDown 0.6s ease;
+/* Top Bar */
+.top-bar {
+  width: 100%;
+  background: var(--wm-blue);
+  padding: 0 48px;
+  z-index: 100;
 
-  h1 {
-    font-size: 1.8rem;
-    margin-bottom: 2rem;
-    font-weight: 600;
-    letter-spacing: 0.5px;
+  .top-bar-inner {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 80px;
+  }
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+
+  .brand-logo {
+    height: 44px;
+    width: auto;
+    object-fit: contain;
   }
 
-  .user-info {
-    h2 {
-      color: $white;
-      font-size: 2rem;
-      font-weight: 700;
-      margin: 0 0 0.5rem 0;
-      text-transform: uppercase;
-      letter-spacing: 1px;
+  .brand-text {
+    color: var(--wm-white);
+    font-size: 2rem;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+  }
+}
+
+.btn-back {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(255, 255, 255, 0.15);
+  border: none;
+  border-radius: 8px;
+  color: var(--wm-white);
+  padding: 10px 20px;
+  font-size: 1rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-family: "Inter", sans-serif;
+
+  svg {
+    width: 20px;
+    height: 20px;
+  }
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.25);
+  }
+}
+
+/* Main Content */
+.main-content {
+  width: 100%;
+  max-width: 1200px;
+  padding: 64px 48px 160px;
+  animation: fadeInUp 0.4s ease;
+}
+
+/* User Badge */
+.user-badge {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  background: var(--wm-white);
+  padding: 20px 24px;
+  border-radius: 14px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+  margin-bottom: 32px;
+  border: 1px solid var(--wm-gray-200);
+
+  .user-avatar {
+    width: 52px;
+    height: 52px;
+    background: rgba(var(--wm-blue-rgb), 0.08);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+
+    svg {
+      width: 28px;
+      height: 28px;
+      color: var(--wm-blue);
+    }
+  }
+
+  .user-details {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    min-width: 0;
+
+    .user-name {
+      font-weight: 600;
+      color: var(--wm-gray-900);
+      font-size: 1.4rem;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
 
-    .rut {
-      color: rgba($white, 0.9);
-      font-size: 1.5rem;
-      font-weight: 600;
-      margin: 0;
-      font-family: 'Courier New', monospace;
-      letter-spacing: 2px;
-      background: rgba(255, 255, 255, 0.15);
-      padding: 8px 20px;
-      border-radius: 8px;
-      display: inline-block;
+    .user-rut {
+      font-size: 1.1rem;
+      color: var(--wm-gray-500);
+      font-weight: 500;
+      font-family: "Inter", monospace;
+      letter-spacing: 0.5px;
     }
+  }
+}
+
+/* Section Header */
+.section-header {
+  margin-bottom: 20px;
+
+  .section-title {
+    font-size: 2.6rem;
+    font-weight: 700;
+    color: var(--wm-gray-900);
+    margin: 0 0 8px;
+    letter-spacing: -0.02em;
+  }
+
+  .section-desc {
+    font-size: 1.3rem;
+    color: var(--wm-gray-500);
+    margin: 0;
   }
 }
 
@@ -61,112 +160,195 @@ $card-border: #3498db;
 .comida-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 20px;
-  max-width: 900px;
+  gap: 16px;
   width: 100%;
-  margin-bottom: 2rem;
-  animation: fadeInUp 0.6s ease;
 }
 
 .comida-card {
-  background: $white;
-  padding: 30px 20px;
-  border-radius: 16px;
+  background: var(--wm-white);
+  padding: 40px 24px;
+  border-radius: 18px;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 15px;
+  gap: 10px;
   cursor: pointer;
-  transition: all 0.3s ease;
+  transition: all 0.2s ease;
   position: relative;
-  border: 3px solid transparent;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-  min-height: 180px;
+  border: 2px solid var(--wm-gray-200);
+  font-family: "Inter", sans-serif;
+  text-align: center;
 
   &.disponible {
     .icon-container {
-      color: $primary-blue;
+      color: var(--wm-blue);
     }
 
     .comida-nombre {
-      color: #2c3e50;
+      color: var(--wm-gray-900);
     }
 
     &:hover {
-      transform: translateY(-5px);
-      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
-      border-color: $card-border;
+      border-color: var(--wm-blue);
+      box-shadow: 0 2px 12px rgba(var(--wm-blue-rgb), 0.1);
     }
 
     &.seleccionado {
-      border-color: $green-action;
-      background: lighten($green-action, 48%);
-      box-shadow: 0 8px 24px rgba($green-action, 0.4);
+      border-color: var(--wm-blue);
+      background: rgba(var(--wm-blue-rgb), 0.04);
+      box-shadow: 0 2px 12px rgba(var(--wm-blue-rgb), 0.12);
 
       .icon-container {
-        color: $green-action;
+        color: var(--wm-blue);
+        background: rgba(var(--wm-blue-rgb), 0.12);
       }
 
       .comida-nombre {
-        color: darken($green-action, 10%);
+        color: var(--wm-blue);
         font-weight: 700;
       }
     }
   }
 
   &.no-disponible {
-    opacity: 0.4;
+    opacity: 0.35;
     cursor: not-allowed;
-    
+
     .icon-container {
-      color: $disabled-gray;
+      color: var(--wm-gray-400);
     }
 
     .comida-nombre {
-      color: $disabled-gray;
+      color: var(--wm-gray-400);
     }
 
     &:hover {
-      transform: none;
+      border-color: var(--wm-gray-200);
+      box-shadow: none;
+    }
+  }
+
+  &.proximamente {
+    cursor: default;
+    border-color: var(--wm-gray-200);
+
+    .icon-container {
+      color: var(--wm-accent);
+      background: rgba(var(--wm-accent-rgb, 255, 194, 32), 0.1);
+    }
+
+    .comida-nombre {
+      color: var(--wm-gray-900);
+    }
+
+    .comida-estado {
+      color: var(--wm-accent);
+      font-weight: 600;
+    }
+
+    &:hover {
+      border-color: var(--wm-gray-200);
+      box-shadow: none;
+    }
+  }
+
+  &.finalizado {
+    opacity: 0.45;
+    cursor: not-allowed;
+
+    .icon-container {
+      color: var(--wm-gray-400);
+      background: var(--wm-gray-50);
+    }
+
+    .comida-nombre {
+      color: var(--wm-gray-400);
+    }
+
+    .comida-estado {
+      color: var(--wm-error);
+    }
+
+    &:hover {
+      border-color: var(--wm-gray-200);
+      box-shadow: none;
     }
   }
 
   .icon-container {
-    width: 60px;
-    height: 60px;
-    transition: color 0.3s ease;
+    width: 80px;
+    height: 80px;
+    background: rgba(var(--wm-blue-rgb), 0.06);
+    border-radius: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
 
     svg {
-      width: 100%;
-      height: 100%;
+      width: 40px;
+      height: 40px;
+    }
+
+    .service-icon-img {
+      width: 40px;
+      height: 40px;
+      object-fit: contain;
     }
   }
 
   .comida-nombre {
-    font-size: 1.3rem;
+    font-size: 1.4rem;
     font-weight: 600;
     margin: 0;
-    text-align: center;
-    transition: all 0.3s ease;
+    transition: all 0.2s ease;
+  }
+
+  .comida-horario-rango {
+    font-size: 0.95rem;
+    color: var(--wm-gray-400);
+    font-weight: 500;
+    letter-spacing: 0.5px;
+  }
+
+  .comida-estado {
+    font-size: 1rem;
+    color: var(--wm-gray-400);
+    font-weight: 400;
+
+    &.disponible {
+      color: var(--wm-success);
+      font-weight: 600;
+    }
+
+    &.proximamente {
+      color: var(--wm-accent);
+      font-weight: 600;
+    }
+
+    &.finalizado {
+      color: var(--wm-error);
+      font-weight: 500;
+    }
   }
 
   .check-mark {
     position: absolute;
-    top: 10px;
-    right: 10px;
-    width: 32px;
-    height: 32px;
-    background: $green-action;
+    top: 8px;
+    right: 8px;
+    width: 24px;
+    height: 24px;
+    background: var(--wm-blue);
     border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
-    animation: scaleIn 0.3s ease;
+    animation: scaleIn 0.2s ease;
 
     svg {
-      width: 20px;
-      height: 20px;
-      fill: $white;
+      width: 14px;
+      height: 14px;
+      fill: var(--wm-white);
     }
   }
 }
@@ -177,61 +359,45 @@ $card-border: #3498db;
   bottom: 0;
   left: 0;
   right: 0;
-  background: #333333;
-  padding: 20px;
-  box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.3);
+  background: var(--wm-white);
+  padding: 24px 32px;
+  padding-bottom: max(24px, env(safe-area-inset-bottom));
+  box-shadow:
+    0 -1px 0 var(--wm-gray-200),
+    0 -8px 24px rgba(0, 0, 0, 0.06);
   z-index: 50;
   display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 20px;
+  justify-content: center;
 }
 
-.btn-volver {
-  padding: 14px 30px;
-  font-size: 1.1rem;
-  font-weight: 600;
-  border: 2px solid rgba($white, 0.3);
-  border-radius: 8px;
-  background: transparent;
-  color: $white;
-  cursor: pointer;
-  transition: all 0.3s ease;
-
-  &:hover {
-    background: rgba($white, 0.1);
-    border-color: $white;
-    transform: translateY(-2px);
-  }
-}
-
-.btn-siguiente {
-  flex: 1;
-  max-width: 400px;
-  margin-left: auto;
-  padding: 18px;
-  font-size: 1.3rem;
+.btn-confirmar {
+  width: 100%;
+  max-width: 800px;
+  padding: 22px;
+  font-size: 1.4rem;
   font-weight: 700;
   border: none;
-  border-radius: 8px;
-  background: $green-action;
-  color: $white;
+  border-radius: 12px;
+  background: var(--wm-blue);
+  color: var(--wm-white);
   cursor: pointer;
-  transition: all 0.3s ease;
+  transition: all 0.2s ease;
   text-transform: uppercase;
-  letter-spacing: 1px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  letter-spacing: 0.5px;
+  font-family: "Inter", sans-serif;
 
   &:hover:not(:disabled) {
-    background: darken($green-action, 10%);
-    transform: translateY(-2px);
-    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.4);
+    background: var(--wm-blue-dark);
+  }
+
+  &:active:not(:disabled) {
+    transform: scale(0.98);
   }
 
   &:disabled {
-    opacity: 0.5;
+    opacity: 0.35;
     cursor: not-allowed;
-    background: #666;
+    background: var(--wm-gray-400);
   }
 }
 
@@ -242,86 +408,93 @@ $card-border: #3498db;
   left: 0;
   right: 0;
   bottom: 0;
-  background: linear-gradient(180deg, $primary-blue 0%, $secondary-blue 100%);
+  background: var(--wm-white);
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  z-index: 100;
+  z-index: 200;
   animation: fadeIn 0.3s ease;
-  padding: 20px;
+  padding: 40px 20px;
 }
 
 .printing-content {
   text-align: center;
-  color: $white;
   width: 100%;
-  max-width: 500px;
+  max-width: 400px;
 
-  .user-name {
-    font-size: 2.5rem;
-    font-weight: 700;
-    margin: 0 0 1rem 0;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-    animation: fadeInDown 0.5s ease;
-  }
-
-  .user-rut {
-    font-size: 2rem;
-    font-weight: 600;
-    margin: 0 0 4rem 0;
-    font-family: 'Courier New', monospace;
-    letter-spacing: 3px;
-    background: rgba(255, 255, 255, 0.15);
-    padding: 12px 30px;
-    border-radius: 10px;
-    display: inline-block;
-    animation: fadeInDown 0.6s ease;
-  }
-
-  .printer-icon {
-    width: 120px;
-    height: 120px;
-    margin: 0 auto 2rem;
+  .printing-icon-wrap {
+    width: 80px;
+    height: 80px;
+    margin: 0 auto 24px;
+    background: rgba(var(--wm-blue-rgb), 0.08);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     animation: pulse 1.5s ease infinite;
-    
-    svg {
-      width: 100%;
-      height: 100%;
-      fill: $white;
-      filter: drop-shadow(0 4px 12px rgba(0, 0, 0, 0.3));
-    }
   }
 
-  .printing-text {
+  .printing-icon {
+    width: 40px;
+    height: 40px;
+    color: var(--wm-blue);
+  }
+
+  .printing-title {
     font-size: 2rem;
     font-weight: 700;
-    margin: 0 0 4rem 0;
-    animation: fadeInUp 0.7s ease;
+    color: var(--wm-gray-900);
+    margin: 0 0 8px;
+  }
+
+  .printing-subtitle {
+    font-size: 0.95rem;
+    color: var(--wm-gray-500);
+    margin: 0 0 32px;
+    font-weight: 500;
+  }
+
+  .progress-bar {
+    width: 100%;
+    max-width: 240px;
+    height: 4px;
+    background: var(--wm-gray-200);
+    border-radius: 4px;
+    overflow: hidden;
+    margin: 0 auto 16px;
+  }
+
+  .progress-fill {
+    height: 100%;
+    background: var(--wm-blue);
+    border-radius: 4px;
+    animation: progress 2s ease infinite;
+  }
+
+  .printing-hint {
+    font-size: 0.85rem;
+    color: var(--wm-gray-400);
+    margin: 0 0 48px;
   }
 
   .btn-terminar {
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    right: 0;
     width: 100%;
-    padding: 20px;
-    font-size: 1.5rem;
+    padding: 22px;
+    font-size: 1.4rem;
     font-weight: 700;
     border: none;
-    background: $green-action;
-    color: $white;
+    border-radius: 12px;
+    background: var(--wm-blue);
+    color: var(--wm-white);
     cursor: pointer;
-    transition: all 0.3s ease;
+    transition: all 0.2s ease;
     text-transform: uppercase;
-    letter-spacing: 1px;
-    box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.3);
-    animation: fadeInUp 0.8s ease;
+    letter-spacing: 0.5px;
+    font-family: "Inter", sans-serif;
 
     &:hover {
-      background: darken($green-action, 10%);
+      background: var(--wm-blue-dark);
     }
 
     &:active {
@@ -331,21 +504,10 @@ $card-border: #3498db;
 }
 
 /* Animaciones */
-@keyframes fadeInDown {
-  from {
-    opacity: 0;
-    transform: translateY(-20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
 @keyframes fadeInUp {
   from {
     opacity: 0;
-    transform: translateY(20px);
+    transform: translateY(16px);
   }
   to {
     opacity: 1;
@@ -363,79 +525,66 @@ $card-border: #3498db;
 }
 
 @keyframes pulse {
-  0%, 100% {
+  0%,
+  100% {
     transform: scale(1);
   }
   50% {
-    transform: scale(1.1);
+    transform: scale(1.06);
   }
 }
 
-@keyframes spin {
+@keyframes progress {
+  0% {
+    width: 0%;
+  }
+  50% {
+    width: 70%;
+  }
+  100% {
+    width: 100%;
+  }
+}
+
+@keyframes scaleIn {
+  from {
+    transform: scale(0);
+  }
   to {
-    transform: rotate(360deg);
+    transform: scale(1);
   }
 }
 
 /* Responsive */
 @media (max-width: 768px) {
-  .header {
-    h1 {
-      font-size: 1.3rem;
-    }
-
-    .user-info {
-      h2 {
-        font-size: 1.5rem;
-      }
-
-      .rut {
-        font-size: 1.2rem;
-      }
-    }
+  .main-content {
+    padding: 24px 16px 110px;
   }
 
   .comida-grid {
     grid-template-columns: repeat(2, 1fr);
-    gap: 15px;
+    gap: 10px;
   }
 
   .comida-card {
-    padding: 25px 15px;
-    min-height: 150px;
-
-    .icon-container {
-      width: 50px;
-      height: 50px;
-    }
-
-    .comida-nombre {
-      font-size: 1.1rem;
-    }
+    padding: 20px 12px;
   }
 
-  .action-footer {
-    flex-direction: column;
-    padding: 15px;
-  }
-
-  .btn-volver {
-    width: 100%;
-  }
-
-  .btn-siguiente {
-    max-width: 100%;
-    font-size: 1.1rem;
+  .section-header .section-title {
+    font-size: 1.3rem;
   }
 }
 
 @media (max-width: 480px) {
-  .comida-grid {
-    grid-template-columns: 1fr;
+  .top-bar .top-bar-inner {
+    height: 56px;
   }
 
-  .comida-card {
-    padding: 20px;
-    min-height: 130px;
+  .brand .brand-text {
+    font-size: 1.2rem;
+  }
+
+  .comida-grid {
+    grid-template-columns: repeat(2, 1fr);
   }
 }

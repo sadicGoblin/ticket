@@ -1,24 +1,118 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable, of } from 'rxjs';
-import { delay } from 'rxjs/operators';
+import { Observable, of, map, catchError } from 'rxjs';
 
-export type TipoComida = 'Desayuno' | 'Almuerzo' | 'Cena' | 'Colación' | 'Nocturna' | 'Otros';
+// ── Interfaces de la API real ──
+
+export interface ApiPerson {
+  id: number;
+  first_name: string;
+  last_name: string;
+  full_name: string;
+  email: string;
+  phone: string | null;
+  document_type: string;
+  document_number: string;
+  company: string | null;
+  position: string | null;
+  photo: string | null;
+}
+
+export interface ApiService {
+  id: number;
+  name: string;
+  code: string;
+  description: string | null;
+  icon: string | null;
+  icon_url: string | null;
+  color: string | null;
+  priority: string;
+  estimated_time: number | null;
+  time_from: string | null; // "09:00:00"
+  time_to: string | null; // "11:00:00"
+  is_active: boolean;
+}
+
+export interface ApiPersonTicket {
+  id: number;
+  ticket_number: string;
+  service: ApiService;
+  subject: string | null;
+  description: string | null;
+  status: string;
+  priority: string;
+  due_date: string | null;
+  is_overdue: boolean;
+  created: string;
+  modified: string;
+}
+
+export interface ApiAttendeeInfo {
+  id: number;
+  role: string;
+  status: string;
+  registration_date: string;
+  confirmation_date: string | null;
+  check_in_date: string | null;
+  badge_number: string | null;
+  seat_number: string | null;
+  special_requirements: string;
+  is_confirmed: boolean;
+  has_checked_in: boolean;
+}
+
+export interface ApiEvent {
+  id: number;
+  code: string;
+  name: string;
+  slug: string;
+  description: string;
+  image: string | null;
+  organization: number;
+  organization_name: string;
+  date_start: string;
+  date_end: string;
+  location: string;
+  max_capacity: number;
+  status: string;
+  is_active_event: boolean;
+  attendee_info: ApiAttendeeInfo;
+  services: ApiService[];
+  person_tickets: ApiPersonTicket[];
+}
+
+export interface ApiPersonEventsResponse {
+  person: ApiPerson;
+  date: string;
+  events_count: number;
+  events: ApiEvent[];
+}
+
+// ── Interfaces internas de la app ──
 
 export interface EmpleadoCasino {
   rut: string;
   nombre: string;
-  area: string;
-  turno: string;
-  opcionesDisponibles: TipoComida[];
+  persona: ApiPerson;
+  eventos: ApiEvent[];
 }
 
-export interface TipoComidaInfo {
-  id: string;
-  nombre: TipoComida;
-  icono: string;
-  disponible: boolean;
-  horario: string;
+export type EstadoHorario = 'disponible' | 'proximamente' | 'finalizado';
+
+export interface ServicioComida {
+  id: number;
+  nombre: string;
+  code: string;
+  icono: string | null;
+  iconUrl: string | null;
+  disponible: boolean; // true si está en person_tickets
+  ticketId: number | null;
+  ticketNumber: string | null;
+  ticketStatus: string | null;
+  timeFrom: string | null; // "09:00:00"
+  timeTo: string | null; // "11:00:00"
+  estadoHorario: EstadoHorario; // calculado según hora actual
+  segundosParaAbrir: number; // segundos restantes si es 'proximamente', 0 en otro caso
 }
 
 export interface RespuestaVerificacion {
@@ -27,148 +121,192 @@ export interface RespuestaVerificacion {
   mensaje?: string;
 }
 
+// Mantener por compatibilidad
+export type TipoComida = string;
+export interface TipoComidaInfo {
+  id: string;
+  nombre: string;
+  icono: string;
+  disponible: boolean;
+  horario: string;
+}
+
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class CasinoService {
-  // URL de la API - cambiar en producción
-  private readonly API_URL = 'http://localhost:3000/api';
-
-  // Base de datos simulada para desarrollo
-  private empleadosSimulados: EmpleadoCasino[] = [
-    {
-      rut: '12345678-9',
-      nombre: 'JUAN PEREZ L.',
-      area: 'Producción',
-      turno: 'Mañana',
-      opcionesDisponibles: ['Desayuno', 'Almuerzo', 'Colación']
-    },
-    {
-      rut: '15091233-K',
-      nombre: 'MARIA GONZALEZ S.',
-      area: 'Administración',
-      turno: 'Tarde',
-      opcionesDisponibles: ['Almuerzo', 'Colación']
-    },
-    {
-      rut: '20542874-7',
-      nombre: 'PEDRO RODRIGUEZ M.',
-      area: 'Mantención',
-      turno: 'Noche',
-      opcionesDisponibles: ['Cena', 'Nocturna']
-    },
-    {
-      rut: '18765432-1',
-      nombre: 'ANA MARTINEZ V.',
-      area: 'Ventas',
-      turno: 'Mañana',
-      opcionesDisponibles: ['Desayuno', 'Almuerzo']
-    },
-    {
-      rut: '11111111-1',
-      nombre: 'SOFIA FERNANDEZ R.',
-      area: 'RRHH',
-      turno: 'Mañana',
-      opcionesDisponibles: ['Desayuno', 'Almuerzo']
-    },
-    {
-      rut: '22222222-2',
-      nombre: 'DIEGO SANCHEZ P.',
-      area: 'Calidad',
-      turno: 'Noche',
-      opcionesDisponibles: ['Cena', 'Nocturna', 'Otros']
-    }
-  ];
-
-  private tiposComida: TipoComidaInfo[] = [
-    { id: 'desayuno', nombre: 'Desayuno', icono: 'utensils', disponible: true, horario: '07:00 - 09:00' },
-    { id: 'almuerzo', nombre: 'Almuerzo', icono: 'utensils', disponible: true, horario: '12:00 - 14:30' },
-    { id: 'cena', nombre: 'Cena', icono: 'utensils', disponible: false, horario: '19:00 - 21:00' },
-    { id: 'colacion', nombre: 'Colación', icono: 'utensils', disponible: true, horario: '16:00 - 17:00' },
-    { id: 'nocturna', nombre: 'Nocturna', icono: 'utensils', disponible: false, horario: '00:00 - 02:00' },
-    { id: 'otros', nombre: 'Otros', icono: 'utensils', disponible: false, horario: 'Variable' }
-  ];
+  private readonly API_URL = 'http://192.168.100.10:8051';
 
   constructor(private http: HttpClient) {}
 
   /**
-   * Verifica si un empleado tiene ticket de casino disponible
-   * @param rut RUT del empleado (con o sin formato)
-   * @returns Observable con la respuesta de verificación
+   * Verifica persona y obtiene sus eventos/servicios desde la API real
    */
   verificarTicketCasino(rut: string): Observable<RespuestaVerificacion> {
-    // Limpiar el RUT (quitar puntos y guiones)
     const rutLimpio = this.limpiarRut(rut);
-    
-    // Para desarrollo, usar datos simulados
-    // En producción, descomentar la línea siguiente:
-    // return this.http.post<RespuestaVerificacion>(`${this.API_URL}/casino/verificar`, { rut: rutLimpio });
-    
-    // Simulación para desarrollo
-    return this.verificarTicketSimulado(rutLimpio);
+    // Reconstruir con guión pero sin puntos: 18618839-K
+    const rutSinPuntos =
+      rutLimpio.length >= 2
+        ? rutLimpio.slice(0, -1) + '-' + rutLimpio.slice(-1)
+        : rutLimpio;
+
+    return this.http
+      .get<ApiPersonEventsResponse>(`${this.API_URL}/api/person-events/`, {
+        params: { document_number: rutSinPuntos },
+      })
+      .pipe(
+        map((response) => {
+          if (response && response.person) {
+            const empleado: EmpleadoCasino = {
+              rut: response.person.document_number,
+              nombre: response.person.full_name,
+              persona: response.person,
+              eventos: response.events || [],
+            };
+            return {
+              success: true,
+              empleado,
+              mensaje: `Usuario encontrado: ${empleado.nombre}`,
+            };
+          }
+          return {
+            success: false,
+            mensaje: 'No se encontró información para este RUT',
+          };
+        }),
+        catchError((error) => {
+          console.error('Error en API person-events:', error);
+          let mensaje = 'Error al conectar con el servidor';
+          if (error.status === 404) {
+            mensaje = 'RUT no encontrado en el sistema';
+          } else if (error.status === 0) {
+            mensaje =
+              'No se pudo conectar con el servidor. Verifique la conexión';
+          }
+          return of({ success: false, mensaje });
+        }),
+      );
   }
 
   /**
-   * Marca un ticket como utilizado
-   * @param rut RUT del empleado
-   * @returns Observable con confirmación
+   * Extrae los servicios de un evento, marcando cuáles están disponibles (en person_tickets)
+   * y calculando el estado horario según time_from / time_to.
    */
-  marcarTicketUtilizado(rut: string): Observable<any> {
-    const rutLimpio = this.limpiarRut(rut);
-    
-    // En producción:
-    // return this.http.post(`${this.API_URL}/casino/marcar-utilizado`, { rut: rutLimpio });
-    
-    // Simulación
-    return of({ success: true, mensaje: 'Ticket marcado como utilizado' }).pipe(delay(500));
+  getServiciosDeEvento(evento: ApiEvent): ServicioComida[] {
+    const ahora = new Date();
+
+    return evento.services.map((service) => {
+      const ticket = evento.person_tickets.find(
+        (pt) => pt.service.id === service.id,
+      );
+
+      const { estado, segundosParaAbrir } = this.calcularEstadoHorario(
+        service.time_from,
+        service.time_to,
+        ahora,
+      );
+
+      return {
+        id: service.id,
+        nombre: service.name,
+        code: service.code,
+        icono: service.icon,
+        iconUrl: service.icon_url,
+        disponible: !!ticket,
+        ticketId: ticket ? ticket.id : null,
+        ticketNumber: ticket ? ticket.ticket_number : null,
+        ticketStatus: ticket ? ticket.status : null,
+        timeFrom: service.time_from,
+        timeTo: service.time_to,
+        estadoHorario: estado,
+        segundosParaAbrir,
+      };
+    });
+  }
+
+  /**
+   * Calcula si un servicio está disponible, próximamente o finalizado
+   * basado en time_from y time_to (formato "HH:mm:ss").
+   */
+  private calcularEstadoHorario(
+    timeFrom: string | null,
+    timeTo: string | null,
+    ahora: Date,
+  ): { estado: EstadoHorario; segundosParaAbrir: number } {
+    // Sin horario definido → disponible siempre
+    if (!timeFrom || !timeTo) {
+      return { estado: 'disponible', segundosParaAbrir: 0 };
+    }
+
+    const hoy = ahora.toISOString().slice(0, 10); // "YYYY-MM-DD"
+    const desde = new Date(`${hoy}T${timeFrom}`);
+    const hasta = new Date(`${hoy}T${timeTo}`);
+
+    if (ahora < desde) {
+      const diffMs = desde.getTime() - ahora.getTime();
+      const segundos = Math.ceil(diffMs / 1000);
+      return { estado: 'proximamente', segundosParaAbrir: segundos };
+    }
+
+    if (ahora > hasta) {
+      return { estado: 'finalizado', segundosParaAbrir: 0 };
+    }
+
+    return { estado: 'disponible', segundosParaAbrir: 0 };
+  }
+
+  /**
+   * Formatea segundos restantes en texto legible: "2h 30min 15s", "45min 10s", "30s", etc.
+   */
+  formatearTiempoRestante(segundos: number): string {
+    if (segundos <= 0) return '';
+    const h = Math.floor(segundos / 3600);
+    const m = Math.floor((segundos % 3600) / 60);
+    const s = segundos % 60;
+    const parts: string[] = [];
+    if (h > 0) parts.push(`${h}h`);
+    if (m > 0) parts.push(`${m}min`);
+    if (s > 0 && h === 0) parts.push(`${s}s`); // solo mostrar segundos si < 1 hora
+    return parts.join(' ') || '0s';
   }
 
   /**
    * Limpia el formato del RUT (quita puntos y guiones)
-   * @param rut RUT con o sin formato
-   * @returns RUT limpio
    */
-  private limpiarRut(rut: string): string {
+  limpiarRut(rut: string): string {
     return rut.replace(/\./g, '').replace(/-/g, '');
   }
 
   /**
    * Formatea el RUT para mostrarlo (12.345.678-9)
-   * @param rut RUT sin formato
-   * @returns RUT formateado
    */
   formatearRut(rut: string): string {
     const rutLimpio = this.limpiarRut(rut);
-    
+
     if (rutLimpio.length < 2) return rutLimpio;
-    
+
     const dv = rutLimpio.slice(-1);
     const numero = rutLimpio.slice(0, -1);
-    
+
     // Formatear con puntos
     const numeroFormateado = numero.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
-    
+
     return `${numeroFormateado}-${dv}`;
   }
 
   /**
    * Valida el formato del RUT chileno
-   * @param rut RUT a validar
-   * @returns true si es válido, false si no
    */
   validarRut(rut: string): boolean {
     const rutLimpio = this.limpiarRut(rut);
-    
-    // Verificar largo mínimo
+
     if (rutLimpio.length < 8 || rutLimpio.length > 9) {
       return false;
     }
 
-    // Extraer número y dígito verificador
     const numero = parseInt(rutLimpio.slice(0, -1), 10);
     const dv = rutLimpio.slice(-1).toLowerCase();
 
-    // Calcular dígito verificador
     let suma = 0;
     let multiplicador = 2;
 
@@ -190,37 +328,5 @@ export class CasinoService {
     }
 
     return dv === dvEsperado;
-  }
-
-  /**
-   * Obtiene información de tipos de comida
-   * @returns Array de tipos de comida disponibles
-   */
-  getTiposComida(): TipoComidaInfo[] {
-    return this.tiposComida;
-  }
-
-  /**
-   * Verificación simulada para desarrollo
-   * @param rut RUT limpio
-   * @returns Observable con respuesta simulada
-   */
-  private verificarTicketSimulado(rut: string): Observable<RespuestaVerificacion> {
-    const empleado = this.empleadosSimulados.find(emp => 
-      this.limpiarRut(emp.rut) === rut
-    );
-
-    if (empleado) {
-      return of({
-        success: true,
-        empleado: empleado,
-        mensaje: `Usuario encontrado: ${empleado.nombre}`
-      }).pipe(delay(1000)); // Simular latencia de red
-    } else {
-      return of({
-        success: false,
-        mensaje: 'RUT no encontrado en el sistema'
-      }).pipe(delay(1000));
-    }
   }
 }

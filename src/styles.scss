@@ -1,13 +1,43 @@
-/* Variables CSS dinámicas */
+/* Brand Design System - Configurable via API */
 :root {
-  --primary-color: #007bff;
-  --secondary-color: #6c757d;
-  --success-color: #28a745;
-  --danger-color: #dc3545;
-  --warning-color: #ffc107;
-  --info-color: #17a2b8;
-  --light-color: #f8f9fa;
-  --dark-color: #343a40;
+  /* Colores principales */
+  --wm-blue: #0071dc;
+  --wm-blue-dark: #004c91;
+  --wm-blue-darker: #00254a;
+  --wm-yellow: #ffc220;
+  --wm-yellow-light: #ffd655;
+
+  /* RGB channels para uso con rgba() */
+  --wm-blue-rgb: 0, 113, 220;
+  --wm-blue-dark-rgb: 0, 76, 145;
+  --wm-yellow-rgb: 255, 194, 32;
+  --wm-success-rgb: 45, 140, 60;
+  --wm-error-rgb: 222, 28, 36;
+
+  /* Neutros */
+  --wm-white: #ffffff;
+  --wm-gray-50: #f8f9fa;
+  --wm-gray-100: #f1f3f5;
+  --wm-gray-200: #e9ecef;
+  --wm-gray-300: #dee2e6;
+  --wm-gray-400: #adb5bd;
+  --wm-gray-500: #74787b;
+  --wm-gray-700: #46474a;
+  --wm-gray-900: #2e2f32;
+
+  /* Estado */
+  --wm-success: #2d8c3c;
+  --wm-error: #de1c24;
+  --wm-warning: #f57c00;
+
+  /* Layout */
+  --wm-radius-sm: 8px;
+  --wm-radius-md: 12px;
+  --wm-radius-lg: 16px;
+  --wm-shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.08);
+  --wm-shadow-md: 0 4px 12px rgba(0, 0, 0, 0.1);
+  --wm-shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.12);
+  --wm-shadow-xl: 0 16px 48px rgba(0, 0, 0, 0.16);
 }
 
 /* Reset básico */
@@ -21,9 +51,17 @@ body,
 html {
   margin: 0;
   padding: 0;
-  font-family: 'Poppins', sans-serif;
+  font-family:
+    "Inter",
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    sans-serif;
   height: 100%;
   width: 100%;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background: var(--wm-gray-50);
 }
 
 /* Clases utilitarias */
@@ -32,11 +70,11 @@ html {
 }
 
 .text-primary {
-  color: var(--primary-color);
+  color: var(--wm-blue);
 }
 
 .bg-primary {
-  background-color: var(--primary-color);
+  background-color: var(--wm-blue);
 }
 
 .container {
@@ -48,19 +86,18 @@ html {
 .btn {
   padding: 10px 20px;
   border: none;
-  border-radius: 4px;
+  border-radius: var(--wm-radius-sm);
   cursor: pointer;
-  font-family: 'Poppins', sans-serif;
+  font-family: "Inter", sans-serif;
   font-size: 16px;
-  transition: all 0.3s ease;
+  transition: all 0.2s ease;
 }
 
 .btn-primary {
-  background-color: var(--primary-color);
+  background-color: var(--wm-blue);
   color: white;
 }
 
 .btn-primary:hover {
-  opacity: 0.9;
-  transform: scale(1.05);
+  background-color: var(--wm-blue-dark);
 }
