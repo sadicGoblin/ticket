@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, of, map, catchError } from 'rxjs';
+import { environment } from '../../environments/environment';
 
 // ── Interfaces de la API real ──
 
@@ -135,7 +136,7 @@ export interface TipoComidaInfo {
   providedIn: 'root',
 })
 export class CasinoService {
-  private readonly API_URL = 'http://192.168.100.10:8051';
+  private readonly API_URL = environment.apiUrl;
 
   constructor(private http: HttpClient) {}
 
@@ -151,7 +152,7 @@ export class CasinoService {
         : rutLimpio;
 
     return this.http
-      .get<ApiPersonEventsResponse>(`${this.API_URL}/api/person-events/`, {
+      .get<ApiPersonEventsResponse>(`${this.API_URL}/person-events/`, {
         params: { document_number: rutSinPuntos },
       })
       .pipe(
