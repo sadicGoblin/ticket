@@ -78,40 +78,6 @@
   }
 }
 
-/* Badge de estado de impresora */
-.printer-status-badge {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 8px 18px;
-  border-radius: 20px;
-  background: rgba(255, 255, 255, 0.15);
-  color: var(--wm-white);
-  font-size: 1rem;
-  font-weight: 500;
-
-  .status-dot {
-    width: 8px;
-    height: 8px;
-    border-radius: 50%;
-    background: var(--wm-white);
-  }
-
-  &.online .status-dot {
-    background: #4ade80;
-    box-shadow: 0 0 8px rgba(74, 222, 128, 0.6);
-  }
-
-  &.offline .status-dot {
-    background: #fb7185;
-    box-shadow: 0 0 8px rgba(251, 113, 133, 0.6);
-  }
-
-  &.unknown .status-dot {
-    background: rgba(255, 255, 255, 0.5);
-  }
-}
-
 /* Vista principal */
 .main-view {
   width: 100%;

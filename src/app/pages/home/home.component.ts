@@ -2,11 +2,12 @@ import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { ConfigService } from '../../services/config.service';
+import { PrinterStatusComponent } from '../../components/printer-status/printer-status.component';
 
 @Component({
   selector: 'app-home',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, PrinterStatusComponent],
   templateUrl: './home.component.html',
   styleUrl: './home.component.scss',
 })

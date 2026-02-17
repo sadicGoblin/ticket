@@ -5,11 +5,12 @@ import { Router } from '@angular/router';
 import { CasinoService, EmpleadoCasino } from '../../services/casino.service';
 import { PrinterService } from '../../services/printer.service';
 import { ConfigService } from '../../services/config.service';
+import { PrinterStatusComponent } from '../../components/printer-status/printer-status.component';
 
 @Component({
   selector: 'app-rut-verification',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, PrinterStatusComponent],
   templateUrl: './rut-verification.component.html',
   styleUrl: './rut-verification.component.scss',
 })
@@ -44,8 +45,6 @@ export class RutVerificationComponent implements OnDestroy {
     this.logoUrl = this.configService.orgLogoUrl;
     // Leer flujo actual desde sessionStorage
     this.flujoActual = sessionStorage.getItem('flujoActual') || '';
-    // Verificar estado de la impresora al iniciar
-    this.verificarImpresora();
     // Iniciar el timer de inactividad
     this.resetInactivityTimer();
   }
@@ -53,24 +52,6 @@ export class RutVerificationComponent implements OnDestroy {
   ngOnDestroy(): void {
     // Limpiar timers al destruir el componente
     this.clearInactivityTimer();
-  }
-
-  /**
-   * Verifica si la impresora está disponible
-   */
-  verificarImpresora(): void {
-    this.printerService.verificarConexion().subscribe({
-      next: () => {
-        this.printerStatus = 'online';
-        console.log('✅ Impresora conectada');
-      },
-      error: () => {
-        this.printerStatus = 'offline';
-        console.warn(
-          '⚠️ Impresora no conectada - Los tickets no se imprimirán',
-        );
-      },
-    });
   }
 
   /**

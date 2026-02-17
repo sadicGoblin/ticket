@@ -70,24 +70,25 @@ def generar_ticket(pedido):
     seleccion = pedido.get("seleccion", "")
     para_llevar = pedido.get("paraLlevar", False)
     
-    # Si no viene seleccion directa, extraer desde productos
-    if not seleccion:
-        productos = pedido.get("productos", [])
-        if productos and len(productos) > 0:
-            nombre_producto = productos[0].get("nombre", "")
-            # Extraer tipo de comida del nombre del producto
-            if "Almuerzo" in nombre_producto:
-                seleccion = "almuerzo"
-            elif "Desayuno" in nombre_producto:
-                seleccion = "desayuno"
-            elif "Cena" in nombre_producto:
-                seleccion = "cena"
-            else:
-                seleccion = nombre_producto
-            
-            # Extraer si es para llevar desde el nombre del producto
-            if "Para Llevar" in nombre_producto:
-                para_llevar = True
+    # Extraer desde productos si no viene seleccion directa
+    productos = pedido.get("productos", [])
+    if not seleccion and productos:
+        nombre_producto = productos[0].get("nombre", "")
+        nombre_lower = nombre_producto.lower()
+        if "almuerzo" in nombre_lower:
+            seleccion = "almuerzo"
+        elif "desayuno" in nombre_lower:
+            seleccion = "desayuno"
+        elif "cena" in nombre_lower:
+            seleccion = "cena"
+        elif "colacion" in nombre_lower or "colación" in nombre_lower:
+            seleccion = "colacion"
+        else:
+            # Limpiar prefijo "Ticket de " si existe
+            seleccion = nombre_producto.replace("Ticket de ", "").strip()
+        
+        if "llevar" in nombre_lower:
+            para_llevar = True
     
     # Selección
     ticket += b'\x1b\x45\x01'  # Negrita
@@ -149,6 +150,11 @@ def imprimir():
         })
     except Exception as e:
         return jsonify({"resultado": "error", "mensaje": str(e)}), 500
+
+@app.route("/imprimir-casino", methods=["POST"])
+def imprimir_casino():
+    """Endpoint alternativo para impresión de tickets de casino"""
+    return imprimir()
 
 @app.route("/status", methods=["GET"])
 def status():

@@ -189,6 +189,20 @@ export class CasinoService {
   }
 
   /**
+   * Actualiza el estado de un ticket (e.g. 'printed', 'redeemed')
+   * POST /api/person-tickets/{id}/update-status/
+   */
+  updateTicketStatus(
+    ticketId: number,
+    status: 'printed' | 'redeemed',
+  ): Observable<ApiPersonTicket> {
+    return this.http.patch<ApiPersonTicket>(
+      `${this.API_URL}/api/person-tickets/${ticketId}/`,
+      { status },
+    );
+  }
+
+  /**
    * Extrae los servicios de un evento, marcando cuáles están disponibles (en person_tickets)
    * y calculando el estado horario según time_from / time_to.
    */

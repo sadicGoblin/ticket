@@ -22,20 +22,10 @@
           [src]="logoUrl"
           [alt]="brandName"
         />
-        <span class="brand-text">{{ brandName }}</span>
       </div>
-      <div class="printer-status-badge" [ngClass]="printerStatus">
-        <span class="status-dot"></span>
-        <span class="status-text">
-          @if (printerStatus === "online") {
-            Impresora lista
-          } @else if (printerStatus === "offline") {
-            Sin impresora
-          } @else {
-            Verificando...
-          }
-        </span>
-      </div>
+      <app-printer-status
+        (statusChange)="printerStatus = $event"
+      ></app-printer-status>
     </div>
   </div>
 
