@@ -1,0 +1,7 @@
+{
+  "/api": {
+    "target": "https://ticket-services.favric.cl",
+    "secure": true,
+    "changeOrigin": true
+  }
+} 

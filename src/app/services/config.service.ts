@@ -2,18 +2,25 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { BehaviorSubject, Observable, of } from 'rxjs';
 import { catchError, map, tap } from 'rxjs/operators';
+import { environment } from '../../environments/environment';
 
 // ── Interfaces que coinciden con la respuesta real de la API ──
 
 export interface ApiTemplate {
   id: number;
+  organization: number;
+  organization_name: string;
   name: string;
+  slug: string;
   code: string;
   data: ClientConfig;
   is_active: boolean;
+  is_removed: boolean;
+  created: string;
+  modified: string;
 }
 
-export interface ApiOrganizationResponse {
+export interface ApiOrganization {
   id: number;
   name: string;
   slug: string;
@@ -26,11 +33,28 @@ export interface ApiOrganizationResponse {
   logo_url: string | null;
   description: string;
   is_active: boolean;
-  templates: ApiTemplate[];
-  active_templates: ApiTemplate[];
-  templates_count: number;
-  created: string;
-  modified: string;
+}
+
+export interface ApiEvent {
+  id: number;
+  code: string;
+  name: string;
+  slug?: string;
+  description?: string;
+  location?: string;
+  organization: ApiOrganization;
+  template: ApiTemplate | null;
+  date_start?: string;
+  date_end?: string;
+  status: string;
+  is_active_event?: boolean;
+}
+
+export interface ApiEventAttendanceResponse {
+  event: ApiEvent;
+  dates: any[];
+  services: any[];
+  attendees: any[];
 }
 
 /**
@@ -112,13 +136,13 @@ const DEFAULT_CONFIG: ClientConfig = {
   },
 };
 
-const ORG_CODE_KEY = 'orgCode';
+const EVENT_CODE_KEY = 'eventCode';
 
 @Injectable({
   providedIn: 'root',
 })
 export class ConfigService {
-  private readonly API_URL = 'http://192.168.100.10:8051';
+  private readonly API_URL = environment.apiUrl;
   private config$ = new BehaviorSubject<ClientConfig>(DEFAULT_CONFIG);
   private orgName$ = new BehaviorSubject<string>('');
   private logoUrl$ = new BehaviorSubject<string | null>(null);
@@ -143,56 +167,71 @@ export class ConfigService {
 
   constructor(private http: HttpClient) {}
 
-  // ── Gestión del código de organización (localStorage) ──
+  // ── Gestión del código de evento (localStorage) ──
 
-  /** Verifica si ya existe un código de organización guardado */
+  /** Verifica si ya existe un código de evento guardado */
   get isConfigured(): boolean {
-    return !!localStorage.getItem(ORG_CODE_KEY);
+    return !!localStorage.getItem(EVENT_CODE_KEY);
   }
 
-  /** Obtiene el código guardado */
+  /** Obtiene el código de evento guardado */
+  get eventCode(): string | null {
+    return localStorage.getItem(EVENT_CODE_KEY);
+  }
+
+  /** @deprecated Usar eventCode en su lugar */
   get orgCode(): string | null {
-    return localStorage.getItem(ORG_CODE_KEY);
+    return this.eventCode;
   }
 
-  /** Guarda el código de organización en localStorage */
+  /** Guarda el código de evento en localStorage */
+  saveEventCode(code: string): void {
+    localStorage.setItem(EVENT_CODE_KEY, code);
+  }
+
+  /** @deprecated Usar saveEventCode en su lugar */
   saveOrgCode(code: string): void {
-    localStorage.setItem(ORG_CODE_KEY, code);
+    this.saveEventCode(code);
   }
 
   /** Elimina el código (para reconfigurar) */
+  clearEventCode(): void {
+    localStorage.removeItem(EVENT_CODE_KEY);
+  }
+
+  /** @deprecated Usar clearEventCode en su lugar */
   clearOrgCode(): void {
-    localStorage.removeItem(ORG_CODE_KEY);
+    this.clearEventCode();
   }
 
   // ── Carga de configuración desde la API ──
 
   /**
    * Carga la configuración del cliente desde la API.
-   * @param code Código de la organización (ej: "WM001")
+   * @param code Código del evento (ej: "TEST001")
    */
   loadConfig(code: string): Observable<ClientConfig> {
     return this.http
-      .get<ApiOrganizationResponse>(
-        `${this.API_URL}/api/organization-templates/`,
-        { params: { code } },
+      .get<ApiEventAttendanceResponse>(
+        `${this.API_URL}/event-attendance/${code}/`,
       )
       .pipe(
         map((response) => {
-          // Guardar nombre y logo de la organización
-          this.orgName$.next(response.name);
-          this.logoUrl$.next(response.logo_url || response.logo || null);
+          // Guardar nombre y logo de la organización desde el evento
+          const org = response.event.organization;
+          this.orgName$.next(org?.name || response.event.name);
+          this.logoUrl$.next(org?.logo_url || org?.logo || null);
 
-          // Extraer data del primer template activo
-          const template =
-            response.active_templates?.[0] || response.templates?.[0];
+          // Extraer data del template del evento
+          const template = response.event.template;
           if (!template?.data) {
-            throw new Error('No se encontró template con data en la respuesta');
+            console.warn('⚠️ Evento sin template, usando configuración por defecto');
+            return null;
           }
           return template.data;
         }),
         map((configData) => {
-          const merged = this.mergeWithDefaults(configData);
+          const merged = this.mergeWithDefaults(configData || {});
           this.config$.next(merged);
           this.applyCssVariables(merged);
           console.log('✅ Configuración cargada:', merged.brand.name);
@@ -202,11 +241,11 @@ export class ConfigService {
   }
 
   /**
-   * Carga la configuración usando el código guardado en localStorage.
+   * Carga la configuración usando el código de evento guardado en localStorage.
    * Si no hay código guardado, aplica defaults.
    */
   loadSavedConfig(): Observable<ClientConfig> {
-    const code = this.orgCode;
+    const code = this.eventCode;
     if (!code) {
       this.applyCssVariables(DEFAULT_CONFIG);
       return of(DEFAULT_CONFIG);
