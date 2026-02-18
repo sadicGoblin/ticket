@@ -24,6 +24,7 @@ export class HomeComponent {
   showPasswordModal = false;
   adminPassword = '';
   passwordError = '';
+  pendingAction: 'salir' | 'configurar' | null = null;
 
   constructor(
     private router: Router,
@@ -68,6 +69,7 @@ export class HomeComponent {
   }
 
   solicitarSalida(): void {
+    this.pendingAction = 'salir';
     this.showAdminMenu = false;
     this.showPasswordModal = true;
     this.adminPassword = '';
@@ -83,7 +85,7 @@ export class HomeComponent {
 
     // Auto-submit cuando llega a 4 dígitos
     if (this.adminPassword.length === 4) {
-      setTimeout(() => this.confirmarSalida(), 200);
+      setTimeout(() => this.confirmarAccion(), 200);
     }
   }
 
@@ -92,21 +94,27 @@ export class HomeComponent {
     this.passwordError = '';
   }
 
-  confirmarSalida(): void {
+  confirmarAccion(): void {
     if (this.adminPassword === '1234') {
       this.showPasswordModal = false;
-      // Salir del modo kiosko: cerrar la ventana o navegar fuera
-      window.close();
-      // Fallback si window.close() no funciona (no fue abierta por script)
-      // Mostrar instrucciones
-      document.body.innerHTML = `
-        <div style="display:flex;align-items:center;justify-content:center;height:100vh;font-family:Inter,sans-serif;background:#f8f9fa;">
-          <div style="text-align:center;">
-            <h1 style="font-size:2rem;color:#2e2f32;margin-bottom:12px;">Modo Kiosco Desactivado</h1>
-            <p style="color:#74787b;font-size:1.1rem;">Puede cerrar esta ventana manualmente.</p>
+      
+      if (this.pendingAction === 'salir') {
+        // Salir del modo kiosko: cerrar la ventana o navegar fuera
+        window.close();
+        // Fallback si window.close() no funciona (no fue abierta por script)
+        document.body.innerHTML = `
+          <div style="display:flex;align-items:center;justify-content:center;height:100vh;font-family:Inter,sans-serif;background:#f8f9fa;">
+            <div style="text-align:center;">
+              <h1 style="font-size:2rem;color:#2e2f32;margin-bottom:12px;">Modo Kiosco Desactivado</h1>
+              <p style="color:#74787b;font-size:1.1rem;">Puede cerrar esta ventana manualmente.</p>
+            </div>
           </div>
-        </div>
-      `;
+        `;
+      } else if (this.pendingAction === 'configurar') {
+        this.router.navigate(['/setup'], { queryParams: { reconfig: '1' } });
+      }
+      
+      this.pendingAction = null;
     } else {
       this.passwordError = 'Clave incorrecta';
       this.adminPassword = '';
@@ -114,6 +122,10 @@ export class HomeComponent {
   }
 
   cambiarConfiguracion(): void {
-    this.router.navigate(['/setup'], { queryParams: { reconfig: '1' } });
+    this.pendingAction = 'configurar';
+    this.showAdminMenu = false;
+    this.showPasswordModal = true;
+    this.adminPassword = '';
+    this.passwordError = '';
   }
 }

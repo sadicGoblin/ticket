@@ -263,7 +263,8 @@ export class ComidaSeleccionComponent implements OnInit, OnDestroy {
   confirmarSeleccion(): void {
     if (!this.seleccionado || !this.empleado) return;
 
-    this.clearInactivityTimer();
+    // Mantener timer activo durante el preview (no detenerlo)
+    this.resetInactivityTimer();
 
     // Solo mostrar preview, NO cambiar estado aún
     this.generarQR(this.seleccionado.ticketNumber || '');
@@ -318,6 +319,7 @@ export class ComidaSeleccionComponent implements OnInit, OnDestroy {
   imprimirDesdePreview(): void {
     if (!this.seleccionado || !this.empleado) return;
 
+    this.resetInactivityTimer();
     this.imprimiendo = true;
 
     const productos = [

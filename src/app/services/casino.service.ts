@@ -23,29 +23,46 @@ export interface ApiService {
   id: number;
   name: string;
   code: string;
-  description: string | null;
+  description?: string | null;
   icon: string | null;
-  icon_url: string | null;
+  icon_url?: string | null;
   color: string | null;
-  priority: string;
-  estimated_time: number | null;
+  priority?: string;
+  estimated_time?: number | null;
   time_from: string | null; // "09:00:00"
   time_to: string | null; // "11:00:00"
-  is_active: boolean;
+  is_active?: boolean;
 }
 
+// Uso de un ticket para una fecha específica (TicketUsage)
+export interface ApiTicketUsage {
+  id: number;
+  usage_date: string; // "YYYY-MM-DD"
+  status: 'pending' | 'redeemed' | 'skipped' | 'expired';
+  redeemed_at: string | null;
+  redeemed_by: number | null;
+  redeemed_by_username: string | null;
+  redeemed_by_full_name: string | null;
+  notes: string | null;
+  created: string;
+  modified: string;
+}
+
+// Ticket con usages[] y current_usage (nuevo formato API v2)
 export interface ApiPersonTicket {
   id: number;
   ticket_number: string;
   service: ApiService;
-  subject: string | null;
-  description: string | null;
-  status: string;
-  priority: string;
-  due_date: string | null;
-  is_overdue: boolean;
-  created: string;
-  modified: string;
+  subject?: string | null;
+  description?: string | null;
+  status?: string; // Estado general del ticket (no usar para estado del día)
+  priority?: string;
+  due_date?: string | null;
+  is_overdue?: boolean;
+  usages: ApiTicketUsage[]; // Todos los usos del ticket
+  current_usage: ApiTicketUsage | null; // ⭐ Uso de HOY (fecha consultada)
+  created?: string;
+  modified?: string;
 }
 
 export interface ApiAttendeeInfo {
@@ -79,7 +96,8 @@ export interface ApiEvent {
   is_active_event: boolean;
   attendee_info: ApiAttendeeInfo;
   services: ApiService[];
-  person_tickets: ApiPersonTicket[];
+  person_tickets?: ApiPersonTicket[]; // legacy
+  tickets?: ApiPersonTicket[]; // nuevo formato
 }
 
 export interface ApiPersonEventsResponse {
@@ -198,22 +216,40 @@ export class CasinoService {
     status: 'printed' | 'redeemed',
   ): Observable<ApiPersonTicket> {
     return this.http.patch<ApiPersonTicket>(
-      `${this.API_URL}/api/person-tickets/${ticketId}/`,
+      `${this.API_URL}/person-tickets/${ticketId}/`,
       { status },
     );
   }
 
   /**
-   * Extrae los servicios de un evento, marcando cuáles están disponibles (en person_tickets)
+   * Extrae los servicios de un evento, marcando cuáles están disponibles
    * y calculando el estado horario según time_from / time_to.
+   * Usa current_usage.status para obtener el estado del día actual (API v2).
    */
   getServiciosDeEvento(evento: ApiEvent): ServicioComida[] {
     const ahora = new Date();
+    
+    // Soportar ambos formatos: tickets (nuevo) o person_tickets (legacy)
+    const tickets = evento.tickets || evento.person_tickets || [];
 
     return evento.services.map((service) => {
-      const ticket = evento.person_tickets.find(
+      const ticket = tickets.find(
         (pt) => pt.service.id === service.id,
       );
+
+      // Obtener estado del ticket para HOY usando current_usage
+      let ticketStatus: string | null = null;
+      if (ticket) {
+        if (ticket.current_usage) {
+          // API v2: usar current_usage.status (estado del día consultado)
+          ticketStatus = ticket.current_usage.status;
+        } else if (ticket.status) {
+          // Legacy: usar status directo
+          ticketStatus = ticket.status;
+        } else {
+          ticketStatus = 'pending';
+        }
+      }
 
       const { estado, segundosParaAbrir } = this.calcularEstadoHorario(
         service.time_from,
@@ -226,17 +262,27 @@ export class CasinoService {
         nombre: service.name,
         code: service.code,
         icono: service.icon,
-        iconUrl: service.icon_url,
+        iconUrl: service.icon_url || null,
         disponible: !!ticket,
         ticketId: ticket ? ticket.id : null,
         ticketNumber: ticket ? ticket.ticket_number : null,
-        ticketStatus: ticket ? ticket.status : null,
+        ticketStatus,
         timeFrom: service.time_from,
         timeTo: service.time_to,
         estadoHorario: estado,
         segundosParaAbrir,
       };
     });
+  }
+
+  /**
+   * Obtiene la fecha local en formato "YYYY-MM-DD"
+   */
+  private getFechaLocal(date: Date): string {
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
   }
 
   /**
@@ -253,7 +299,12 @@ export class CasinoService {
       return { estado: 'disponible', segundosParaAbrir: 0 };
     }
 
-    const hoy = ahora.toISOString().slice(0, 10); // "YYYY-MM-DD"
+    // Usar fecha local (no UTC) para evitar desfase de zona horaria
+    const year = ahora.getFullYear();
+    const month = String(ahora.getMonth() + 1).padStart(2, '0');
+    const day = String(ahora.getDate()).padStart(2, '0');
+    const hoy = `${year}-${month}-${day}`;
+    
     const desde = new Date(`${hoy}T${timeFrom}`);
     const hasta = new Date(`${hoy}T${timeTo}`);
 

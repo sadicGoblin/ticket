@@ -174,7 +174,7 @@
   >
     <div class="password-panel" (click)="$event.stopPropagation()">
       <h3>Clave de Administrador</h3>
-      <p>Ingrese la clave para salir del modo kiosco</p>
+      <p>{{ pendingAction === 'configurar' ? 'Ingrese la clave para cambiar configuración' : 'Ingrese la clave para salir del modo kiosco' }}</p>
 
       <!-- PIN display -->
       <div class="pin-display">
