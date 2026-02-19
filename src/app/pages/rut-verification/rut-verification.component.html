@@ -230,7 +230,7 @@
         <div 
           class="success-icon-wrap"
           [class.loading]="checkInStatus === 'loading'"
-          [class.warning]="checkInStatus === 'already'"
+          [class.warning]="checkInStatus === 'already' || (flujoActual === 'ticket' && requiresCheckIn && checkInStatus === 'idle')"
           [class.error]="checkInStatus === 'error'"
         >
           @if (checkInStatus === 'loading') {
@@ -298,6 +298,16 @@
             } @else {
               Empleado Verificado
             }
+          } @else if (flujoActual === 'ticket' && requiresCheckIn) {
+            @if (checkInStatus === 'loading') {
+              Registrando Asistencia...
+            } @else if (checkInStatus === 'success') {
+              Asistencia Registrada
+            } @else if (checkInStatus === 'error') {
+              Error en Registro
+            } @else {
+              Registro Requerido
+            }
           } @else {
             Empleado Verificado
           }
@@ -348,8 +358,48 @@
         </div>
       }
 
+      <!-- Estado de check-in requerido (flujo ticket - modo restrictivo) -->
+      @if (flujoActual === 'ticket' && requiresCheckIn) {
+        <div 
+          class="print-status"
+          [class.warning]="checkInStatus === 'idle'"
+          [class.printing]="checkInStatus === 'loading'"
+          [class.success]="checkInStatus === 'success'"
+          [class.error]="checkInStatus === 'error'"
+        >
+          <div class="print-icon">
+            @if (checkInStatus === 'loading') {
+              <div class="spinner-large"></div>
+            } @else if (checkInStatus === 'success') {
+              <svg viewBox="0 0 24 24" fill="none">
+                <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z" fill="currentColor"/>
+              </svg>
+            } @else {
+              <svg viewBox="0 0 24 24" fill="none">
+                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z" fill="currentColor"/>
+              </svg>
+            }
+          </div>
+          <p class="print-message">{{ checkInMessage }}</p>
+          @if (checkInStatus === 'idle') {
+            <button class="btn-checkin-now" (click)="registrarAsistenciaManual()">
+              <svg viewBox="0 0 24 24" fill="none">
+                <path d="M9 11.75a1.25 1.25 0 100-2.5 1.25 1.25 0 000 2.5zm0 .75c-1.39 0-4 .7-4 2.08V16h8v-1.42C13 13.2 10.39 12.5 9 12.5z" fill="currentColor"/>
+                <path d="M22.5 10h-3V7h-2v3h-3v2h3v3h2v-3h3v-2z" fill="currentColor"/>
+              </svg>
+              Registrar Asistencia Ahora
+            </button>
+          }
+          @if (checkInStatus === 'loading') {
+            <div class="progress-bar">
+              <div class="progress-fill"></div>
+            </div>
+          }
+        </div>
+      }
+
       <!-- Estado de impresión (flujo ticket - legacy) -->
-      @if (flujoActual !== 'asistencia') {
+      @if (flujoActual !== 'asistencia' && !requiresCheckIn) {
         @if (imprimiendo) {
           <div class="print-status printing">
             <div class="print-icon">

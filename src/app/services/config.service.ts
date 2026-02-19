@@ -117,6 +117,9 @@ export interface ClientConfig {
     asistencia_enabled: boolean;
     asistencia_label: string;
     asistencia_description: string;
+    visitante_enabled: boolean;
+    visitante_label: string;
+    visitante_description: string;
   };
 }
 
@@ -155,6 +158,9 @@ const DEFAULT_CONFIG: ClientConfig = {
     asistencia_enabled: true,
     asistencia_label: 'Registro Asistencia',
     asistencia_description: 'Registrar asistencia',
+    visitante_enabled: true,
+    visitante_label: 'Agregar Visitante',
+    visitante_description: 'Registrar visitante en evento',
   },
 };
 

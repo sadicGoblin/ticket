@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { tap } from 'rxjs/operators';
 import { environment } from '../../environments/environment';
 
 // Interfaces según documentación ANGULAR_CHECK_IN_GUIDE.md
@@ -68,9 +69,15 @@ export class DailyAttendanceService {
    * Realizar check-in de una persona en un evento
    */
   checkIn(request: CheckInRequest): Observable<CheckInResponse> {
-    return this.http.post<CheckInResponse>(
-      `${this.API_URL}/check-in/`,
-      request,
+    const url = `${this.API_URL}/check-in/`;
+    console.log('🚀 [DailyAttendance] POST', url);
+    console.log('📤 Payload:', request);
+    
+    return this.http.post<CheckInResponse>(url, request).pipe(
+      tap({
+        next: (res) => console.log('✅ [DailyAttendance] Check-in response:', res),
+        error: (err) => console.error('❌ [DailyAttendance] Check-in error:', err),
+      }),
     );
   }
 
@@ -78,9 +85,15 @@ export class DailyAttendanceService {
    * Realizar check-out de una persona
    */
   checkOut(request: CheckInRequest): Observable<CheckInResponse> {
-    return this.http.post<CheckInResponse>(
-      `${this.API_URL}/check-out/`,
-      request,
+    const url = `${this.API_URL}/check-out/`;
+    console.log('🚀 [DailyAttendance] POST', url);
+    console.log('📤 Payload:', request);
+    
+    return this.http.post<CheckInResponse>(url, request).pipe(
+      tap({
+        next: (res) => console.log('✅ [DailyAttendance] Check-out response:', res),
+        error: (err) => console.error('❌ [DailyAttendance] Check-out error:', err),
+      }),
     );
   }
 
@@ -100,9 +113,14 @@ export class DailyAttendanceService {
       params = params.set('date', date);
     }
 
-    return this.http.get<CheckInVerification>(
-      `${this.API_URL}/check-in/verify/`,
-      { params },
+    const url = `${this.API_URL}/check-in/verify/`;
+    console.log('🚀 [DailyAttendance] GET', url, params.toString());
+    
+    return this.http.get<CheckInVerification>(url, { params }).pipe(
+      tap({
+        next: (res) => console.log('✅ [DailyAttendance] Verify response:', res),
+        error: (err) => console.error('❌ [DailyAttendance] Verify error:', err),
+      }),
     );
   }
 

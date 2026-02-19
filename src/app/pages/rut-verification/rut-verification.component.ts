@@ -9,7 +9,9 @@ import { PrinterStatusComponent } from '../../components/printer-status/printer-
 import {
   DailyAttendanceService,
   CheckInResponse,
+  CheckInVerification,
 } from '../../services/daily-attendance.service';
+import { ApiEvent } from '../../services/casino.service';
 
 @Component({
   selector: 'app-rut-verification',
@@ -33,6 +35,11 @@ export class RutVerificationComponent implements OnDestroy {
   checkInStatus: 'idle' | 'loading' | 'success' | 'already' | 'error' = 'idle';
   checkInMessage: string = '';
   checkInTime: string | null = null;
+
+  // Estado para flujo ticket con check-in requerido
+  requiresCheckIn: boolean = false;
+  checkInVerified: boolean = false;
+  pendingEventCode: string = '';
 
   // Gestión de inactividad
   private inactivityTimeout: any = null;
@@ -223,17 +230,18 @@ export class RutVerificationComponent implements OnDestroy {
           // Navegar según el flujo seleccionado
           const flujo = sessionStorage.getItem('flujoActual') || 'ticket';
           if (flujo === 'ticket') {
-            // Guardar primer evento y pasar directo a selección de servicio
+            // Verificar check-in antes de continuar
             if (
               respuesta.empleado.eventos &&
               respuesta.empleado.eventos.length > 0
             ) {
-              sessionStorage.setItem(
-                'eventoActual',
-                JSON.stringify(respuesta.empleado.eventos[0]),
-              );
+              const evento = respuesta.empleado.eventos[0];
+              sessionStorage.setItem('eventoActual', JSON.stringify(evento));
+              this.empleado = respuesta.empleado;
+              this.verificarCheckInParaTicket(respuesta.empleado, evento);
+            } else {
+              this.errorMensaje = 'No tiene eventos asignados para hoy';
             }
-            this.router.navigate(['/comida-seleccion']);
           } else {
             // Flujo de registro de asistencia - hacer check-in real
             this.empleado = respuesta.empleado;
@@ -304,6 +312,148 @@ export class RutVerificationComponent implements OnDestroy {
           this.errorMensaje =
             'No se pudo conectar con la impresora. Verifique la conexión';
           console.error('❌ Error de conexión con impresora:', error);
+        },
+      });
+  }
+
+  /**
+   * Verifica si el usuario tiene check-in antes de ir a ticket casino
+   */
+  private verificarCheckInParaTicket(empleado: EmpleadoCasino, evento: ApiEvent): void {
+    const rutLimpio = empleado.rut.replace(/[^\dkK]/g, '');
+    const documentNumber =
+      rutLimpio.length >= 2
+        ? rutLimpio.slice(0, -1) + '-' + rutLimpio.slice(-1).toUpperCase()
+        : rutLimpio;
+
+    this.pendingEventCode = evento.code;
+    console.log('🔍 Verificando check-in para ticket. check_in_required:', evento.check_in_required);
+
+    this.dailyAttendanceService
+      .verifyCheckIn(documentNumber, evento.code)
+      .subscribe({
+        next: (verification: CheckInVerification) => {
+          console.log('✅ Verificación check-in:', verification);
+
+          if (verification.has_check_in) {
+            // Ya tiene check-in, puede continuar
+            console.log('✅ Usuario ya tiene check-in, continuando a selección');
+            this.router.navigate(['/comida-seleccion']);
+          } else {
+            // No tiene check-in
+            if (evento.check_in_required === false) {
+              // Modo permisivo: hacer check-in automático
+              console.log('🔓 Modo permisivo: realizando check-in automático');
+              this.realizarCheckInAutomatico(empleado, evento);
+            } else {
+              // Modo restrictivo: mostrar mensaje
+              console.log('🔒 Modo restrictivo: requiere check-in manual');
+              this.requiresCheckIn = true;
+              this.checkInVerified = true;
+              this.checkInStatus = 'idle';
+              this.checkInMessage = 'Debe registrar su asistencia antes de obtener tickets';
+            }
+          }
+        },
+        error: (error) => {
+          console.error('❌ Error verificando check-in:', error);
+          // En caso de error, asumir que necesita check-in si es restrictivo
+          if (evento.check_in_required === false) {
+            // Modo permisivo: intentar check-in automático
+            this.realizarCheckInAutomatico(empleado, evento);
+          } else {
+            // Modo restrictivo: mostrar opción de registrarse
+            this.requiresCheckIn = true;
+            this.checkInVerified = true;
+            this.checkInMessage = 'Debe registrar su asistencia antes de obtener tickets';
+          }
+        },
+      });
+  }
+
+  /**
+   * Realiza check-in automático (modo permisivo)
+   */
+  private realizarCheckInAutomatico(empleado: EmpleadoCasino, evento: ApiEvent): void {
+    const rutLimpio = empleado.rut.replace(/[^\dkK]/g, '');
+    const documentNumber =
+      rutLimpio.length >= 2
+        ? rutLimpio.slice(0, -1) + '-' + rutLimpio.slice(-1).toUpperCase()
+        : rutLimpio;
+
+    this.checkInStatus = 'loading';
+    this.checkInMessage = 'Registrando asistencia automáticamente...';
+
+    this.dailyAttendanceService
+      .checkIn({
+        document_number: documentNumber,
+        event_code: evento.code,
+      })
+      .subscribe({
+        next: (response: CheckInResponse) => {
+          console.log('✅ Check-in automático exitoso:', response);
+          // Continuar a selección de comida
+          this.router.navigate(['/comida-seleccion']);
+        },
+        error: (error) => {
+          console.error('❌ Error en check-in automático:', error);
+          // Si ya existe, continuar de todos modos
+          if (error.error?.existing_check_in) {
+            console.log('ℹ️ Ya tenía check-in, continuando');
+            this.router.navigate(['/comida-seleccion']);
+          } else {
+            // Continuar de todos modos en modo permisivo
+            console.log('⚠️ Error en check-in auto, continuando de todos modos');
+            this.router.navigate(['/comida-seleccion']);
+          }
+        },
+      });
+  }
+
+  /**
+   * Registrar asistencia manualmente (botón en UI)
+   */
+  registrarAsistenciaManual(): void {
+    if (!this.empleado || !this.pendingEventCode) return;
+
+    const rutLimpio = this.empleado.rut.replace(/[^\dkK]/g, '');
+    const documentNumber =
+      rutLimpio.length >= 2
+        ? rutLimpio.slice(0, -1) + '-' + rutLimpio.slice(-1).toUpperCase()
+        : rutLimpio;
+
+    this.checkInStatus = 'loading';
+    this.checkInMessage = 'Registrando asistencia...';
+
+    this.dailyAttendanceService
+      .checkIn({
+        document_number: documentNumber,
+        event_code: this.pendingEventCode,
+      })
+      .subscribe({
+        next: (response: CheckInResponse) => {
+          if (response.success) {
+            console.log('✅ Check-in manual exitoso');
+            this.checkInStatus = 'success';
+            this.checkInMessage = 'Asistencia registrada correctamente';
+            // Esperar un momento y luego continuar
+            setTimeout(() => {
+              this.router.navigate(['/comida-seleccion']);
+            }, 1500);
+          } else {
+            this.checkInStatus = 'error';
+            this.checkInMessage = response.error || 'Error al registrar';
+          }
+        },
+        error: (error) => {
+          console.error('❌ Error en check-in manual:', error);
+          if (error.error?.existing_check_in) {
+            // Ya tenía check-in, puede continuar
+            this.router.navigate(['/comida-seleccion']);
+          } else {
+            this.checkInStatus = 'error';
+            this.checkInMessage = error.error?.error || 'Error al registrar asistencia';
+          }
         },
       });
   }
@@ -399,6 +549,9 @@ export class RutVerificationComponent implements OnDestroy {
     this.checkInStatus = 'idle';
     this.checkInMessage = '';
     this.checkInTime = null;
+    this.requiresCheckIn = false;
+    this.checkInVerified = false;
+    this.pendingEventCode = '';
     this.clearInactivityTimer();
     // Volver al inicio (home)
     this.router.navigate(['/home']);

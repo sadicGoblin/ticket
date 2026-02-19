@@ -36,9 +36,14 @@ export class HomeComponent {
     sessionStorage.removeItem('tipoServicio');
   }
 
-  seleccionarFlujo(flujo: 'ticket' | 'asistencia'): void {
+  seleccionarFlujo(flujo: 'ticket' | 'asistencia' | 'visitante'): void {
     sessionStorage.setItem('flujoActual', flujo);
-    this.router.navigate(['/rut-verification']);
+    
+    if (flujo === 'visitante') {
+      this.router.navigate(['/agregar-visitante']);
+    } else {
+      this.router.navigate(['/rut-verification']);
+    }
   }
 
   // ── Hidden admin trigger ──

@@ -44,6 +44,14 @@ export const routes: Routes = [
       ),
   },
   {
+    path: 'agregar-visitante',
+    canActivate: [configuredGuard],
+    loadComponent: () =>
+      import('./pages/agregar-visitante/agregar-visitante.component').then(
+        (m) => m.AgregarVisitanteComponent,
+      ),
+  },
+  {
     path: 'home',
     canActivate: [configuredGuard],
     loadComponent: () =>

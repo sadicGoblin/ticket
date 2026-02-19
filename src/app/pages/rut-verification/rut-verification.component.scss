@@ -555,6 +555,39 @@
   }
 }
 
+.btn-checkin-now {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  background: var(--wm-blue);
+  color: var(--wm-white);
+  border: none;
+  border-radius: 12px;
+  padding: 16px 32px;
+  font-size: 1.1rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  margin-top: 16px;
+  font-family: "Inter", sans-serif;
+
+  svg {
+    width: 24px;
+    height: 24px;
+  }
+
+  &:hover {
+    background: var(--wm-blue-dark);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(var(--wm-blue-rgb), 0.3);
+  }
+
+  &:active {
+    transform: scale(0.98);
+  }
+}
+
 .progress-bar {
   width: 100%;
   max-width: 240px;

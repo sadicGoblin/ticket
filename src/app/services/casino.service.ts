@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable, of, map, catchError } from 'rxjs';
+import { Observable, of, map, catchError, tap } from 'rxjs';
 import { environment } from '../../environments/environment';
 
 // ── Interfaces de la API real ──
@@ -94,6 +94,7 @@ export interface ApiEvent {
   max_capacity: number;
   status: string;
   is_active_event: boolean;
+  check_in_required: boolean; // true = restrictivo, false = permisivo (auto check-in)
   attendee_info: ApiAttendeeInfo;
   services: ApiService[];
   person_tickets?: ApiPersonTicket[]; // legacy
@@ -169,11 +170,16 @@ export class CasinoService {
         ? rutLimpio.slice(0, -1) + '-' + rutLimpio.slice(-1)
         : rutLimpio;
 
+    const url = `${this.API_URL}/person-events/`;
+    const params = { document_number: rutSinPuntos };
+    
+    console.log('🚀 [CasinoService] GET', url);
+    console.log('📤 Params:', params);
+    
     return this.http
-      .get<ApiPersonEventsResponse>(`${this.API_URL}/person-events/`, {
-        params: { document_number: rutSinPuntos },
-      })
+      .get<ApiPersonEventsResponse>(url, { params })
       .pipe(
+        tap((res) => console.log('✅ [CasinoService] Person events response:', res)),
         map((response) => {
           if (response && response.person) {
             const empleado: EmpleadoCasino = {
@@ -215,9 +221,17 @@ export class CasinoService {
     ticketId: number,
     status: 'printed' | 'redeemed',
   ): Observable<ApiPersonTicket> {
-    return this.http.patch<ApiPersonTicket>(
-      `${this.API_URL}/person-tickets/${ticketId}/`,
-      { status },
+    const url = `${this.API_URL}/person-tickets/${ticketId}/`;
+    const payload = { status };
+    
+    console.log('🚀 [CasinoService] PATCH', url);
+    console.log('📤 Payload:', payload);
+    
+    return this.http.patch<ApiPersonTicket>(url, payload).pipe(
+      tap({
+        next: (res) => console.log('✅ [CasinoService] Update ticket response:', res),
+        error: (err) => console.error('❌ [CasinoService] Update ticket error:', err),
+      }),
     );
   }
 
