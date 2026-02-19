@@ -9,15 +9,16 @@ import { environment } from '../../environments/environment';
 export interface ApiTemplate {
   id: number;
   organization: number;
-  organization_name: string;
+  organization_name?: string;
+  organization_detail?: ApiOrganization;
   name: string;
-  slug: string;
+  slug?: string;
   code: string;
   data: ClientConfig;
   is_active: boolean;
-  is_removed: boolean;
-  created: string;
-  modified: string;
+  is_removed?: boolean;
+  created?: string;
+  modified?: string;
 }
 
 export interface ApiOrganization {
@@ -55,6 +56,27 @@ export interface ApiEventAttendanceResponse {
   dates: any[];
   services: any[];
   attendees: any[];
+}
+
+// Respuesta de /api/organization-templates/?code=XXX
+export interface ApiOrganizationTemplatesResponse {
+  id: number;
+  name: string;
+  slug: string;
+  code: string;
+  email: string | null;
+  phone: string | null;
+  website: string | null;
+  address: string;
+  logo: string | null;
+  logo_url: string | null;
+  description: string;
+  is_active: boolean;
+  templates: ApiTemplate[];
+  active_templates: ApiTemplate[];
+  templates_count: number;
+  created: string;
+  modified: string;
 }
 
 /**
@@ -136,7 +158,7 @@ const DEFAULT_CONFIG: ClientConfig = {
   },
 };
 
-const EVENT_CODE_KEY = 'eventCode';
+const ORG_CODE_KEY = 'orgCode';
 
 @Injectable({
   providedIn: 'root',
@@ -167,65 +189,49 @@ export class ConfigService {
 
   constructor(private http: HttpClient) {}
 
-  // ── Gestión del código de evento (localStorage) ──
+  // ── Gestión del código de organización (localStorage) ──
 
-  /** Verifica si ya existe un código de evento guardado */
+  /** Verifica si ya existe un código de organización guardado */
   get isConfigured(): boolean {
-    return !!localStorage.getItem(EVENT_CODE_KEY);
+    return !!localStorage.getItem(ORG_CODE_KEY);
   }
 
-  /** Obtiene el código de evento guardado */
-  get eventCode(): string | null {
-    return localStorage.getItem(EVENT_CODE_KEY);
-  }
-
-  /** @deprecated Usar eventCode en su lugar */
+  /** Obtiene el código de organización guardado */
   get orgCode(): string | null {
-    return this.eventCode;
+    return localStorage.getItem(ORG_CODE_KEY);
   }
 
-  /** Guarda el código de evento en localStorage */
-  saveEventCode(code: string): void {
-    localStorage.setItem(EVENT_CODE_KEY, code);
-  }
-
-  /** @deprecated Usar saveEventCode en su lugar */
+  /** Guarda el código de organización en localStorage */
   saveOrgCode(code: string): void {
-    this.saveEventCode(code);
+    localStorage.setItem(ORG_CODE_KEY, code);
   }
 
   /** Elimina el código (para reconfigurar) */
-  clearEventCode(): void {
-    localStorage.removeItem(EVENT_CODE_KEY);
-  }
-
-  /** @deprecated Usar clearEventCode en su lugar */
   clearOrgCode(): void {
-    this.clearEventCode();
+    localStorage.removeItem(ORG_CODE_KEY);
   }
 
   // ── Carga de configuración desde la API ──
 
   /**
    * Carga la configuración del cliente desde la API.
-   * @param code Código del evento (ej: "TEST001")
+   * @param code Código de la organización (ej: "WM001")
    */
   loadConfig(code: string): Observable<ClientConfig> {
     return this.http
-      .get<ApiEventAttendanceResponse>(
-        `${this.API_URL}/event-attendance/${code}/`,
+      .get<ApiOrganizationTemplatesResponse>(
+        `${this.API_URL}/organization-templates/?code=${code}`,
       )
       .pipe(
         map((response) => {
-          // Guardar nombre y logo de la organización desde el evento
-          const org = response.event.organization;
-          this.orgName$.next(org?.name || response.event.name);
-          this.logoUrl$.next(org?.logo_url || org?.logo || null);
+          // Guardar nombre y logo de la organización
+          this.orgName$.next(response.name || '');
+          this.logoUrl$.next(response.logo_url || response.logo || null);
 
-          // Extraer data del template del evento
-          const template = response.event.template;
+          // Extraer data del primer template activo
+          const template = response.active_templates?.[0] || response.templates?.[0];
           if (!template?.data) {
-            console.warn('⚠️ Evento sin template, usando configuración por defecto');
+            console.warn('⚠️ Organización sin template, usando configuración por defecto');
             return null;
           }
           return template.data;
@@ -241,11 +247,11 @@ export class ConfigService {
   }
 
   /**
-   * Carga la configuración usando el código de evento guardado en localStorage.
+   * Carga la configuración usando el código de organización guardado en localStorage.
    * Si no hay código guardado, aplica defaults.
    */
   loadSavedConfig(): Observable<ClientConfig> {
-    const code = this.eventCode;
+    const code = this.orgCode;
     if (!code) {
       this.applyCssVariables(DEFAULT_CONFIG);
       return of(DEFAULT_CONFIG);

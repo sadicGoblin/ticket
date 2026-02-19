@@ -225,21 +225,83 @@
   <!-- Vista de resultado exitoso -->
   <div class="result-view" *ngIf="empleado">
     <div class="success-card">
+      <!-- Header según flujo -->
       <div class="success-header">
-        <div class="success-icon-wrap">
-          <svg
-            class="success-icon"
-            viewBox="0 0 24 24"
-            fill="none"
-            xmlns="http://www.w3.org/2000/svg"
-          >
-            <path
-              d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"
-              fill="currentColor"
-            />
-          </svg>
+        <div 
+          class="success-icon-wrap"
+          [class.loading]="checkInStatus === 'loading'"
+          [class.warning]="checkInStatus === 'already'"
+          [class.error]="checkInStatus === 'error'"
+        >
+          @if (checkInStatus === 'loading') {
+            <div class="spinner-large"></div>
+          } @else if (checkInStatus === 'success') {
+            <svg
+              class="success-icon"
+              viewBox="0 0 24 24"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"
+                fill="currentColor"
+              />
+            </svg>
+          } @else if (checkInStatus === 'already') {
+            <svg
+              class="success-icon"
+              viewBox="0 0 24 24"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"
+                fill="currentColor"
+              />
+            </svg>
+          } @else if (checkInStatus === 'error') {
+            <svg
+              class="success-icon"
+              viewBox="0 0 24 24"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M12 2C6.47 2 2 6.47 2 12s4.47 10 10 10 10-4.47 10-10S17.53 2 12 2zm5 13.59L15.59 17 12 13.41 8.41 17 7 15.59 10.59 12 7 8.41 8.41 7 12 10.59 15.59 7 17 8.41 13.41 12 17 15.59z"
+                fill="currentColor"
+              />
+            </svg>
+          } @else {
+            <svg
+              class="success-icon"
+              viewBox="0 0 24 24"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"
+                fill="currentColor"
+              />
+            </svg>
+          }
         </div>
-        <h2>Empleado Verificado</h2>
+        <h2>
+          @if (flujoActual === 'asistencia') {
+            @if (checkInStatus === 'loading') {
+              Registrando Asistencia...
+            } @else if (checkInStatus === 'success') {
+              Asistencia Registrada
+            } @else if (checkInStatus === 'already') {
+              Ya Registrado Hoy
+            } @else if (checkInStatus === 'error') {
+              Error en Registro
+            } @else {
+              Empleado Verificado
+            }
+          } @else {
+            Empleado Verificado
+          }
+        </h2>
       </div>
 
       <div class="employee-info">
@@ -251,67 +313,104 @@
           <span class="info-label">RUT</span>
           <span class="info-value">{{ empleado.rut }}</span>
         </div>
-        <div class="info-item" *ngIf="empleado.persona.email">
-          <span class="info-label">Email</span>
-          <span class="info-value">{{ empleado.persona.email }}</span>
-        </div>
-        <div class="info-item highlight" *ngIf="empleado.eventos.length > 0">
-          <span class="info-label">Eventos Asignados</span>
-          <span class="info-value">{{ empleado.eventos.length }}</span>
-        </div>
+        @if (flujoActual === 'asistencia' && checkInTime) {
+          <div class="info-item highlight">
+            <span class="info-label">Hora de Registro</span>
+            <span class="info-value">{{ checkInTime | date:'HH:mm' }}</span>
+          </div>
+        }
+        @if (flujoActual === 'asistencia' && empleado.eventos.length > 0) {
+          <div class="info-item">
+            <span class="info-label">Evento</span>
+            <span class="info-value">{{ empleado.eventos[0].name }}</span>
+          </div>
+        }
       </div>
 
-      <!-- Estado de impresión -->
-      @if (imprimiendo) {
-        <div class="print-status printing">
-          <div class="print-icon">
-            <svg
-              viewBox="0 0 24 24"
-              fill="none"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <path
-                d="M19 8H5c-1.66 0-3 1.34-3 3v6h4v4h12v-4h4v-6c0-1.66-1.34-3-3-3zm-3 11H8v-5h8v5zm3-7c-.55 0-1-.45-1-1s.45-1 1-1 1 .45 1 1-.45 1-1 1zm-1-9H6v4h12V3z"
-                fill="currentColor"
-              />
-            </svg>
-          </div>
-          <p class="print-message">Imprimiendo ticket...</p>
-          <div class="progress-bar">
-            <div class="progress-fill"></div>
-          </div>
+      <!-- Estado del check-in (flujo asistencia) -->
+      @if (flujoActual === 'asistencia') {
+        <div 
+          class="print-status"
+          [class.printing]="checkInStatus === 'loading'"
+          [class.success]="checkInStatus === 'success'"
+          [class.warning]="checkInStatus === 'already'"
+          [class.error]="checkInStatus === 'error'"
+        >
+          <p class="print-message">{{ checkInMessage }}</p>
+          @if (checkInStatus === 'loading') {
+            <div class="progress-bar">
+              <div class="progress-fill"></div>
+            </div>
+          }
+          @if (checkInStatus === 'success' || checkInStatus === 'already') {
+            <p class="print-submessage">Volviendo al inicio...</p>
+          }
         </div>
-      } @else if (ticketImpreso) {
-        <div class="print-status success">
-          <div class="print-icon">
-            <svg
-              viewBox="0 0 24 24"
-              fill="none"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <path
-                d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"
-                fill="currentColor"
-              />
-            </svg>
+      }
+
+      <!-- Estado de impresión (flujo ticket - legacy) -->
+      @if (flujoActual !== 'asistencia') {
+        @if (imprimiendo) {
+          <div class="print-status printing">
+            <div class="print-icon">
+              <svg
+                viewBox="0 0 24 24"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  d="M19 8H5c-1.66 0-3 1.34-3 3v6h4v4h12v-4h4v-6c0-1.66-1.34-3-3-3zm-3 11H8v-5h8v5zm3-7c-.55 0-1-.45-1-1s.45-1 1-1 1 .45 1 1-.45 1-1 1zm-1-9H6v4h12V3z"
+                  fill="currentColor"
+                />
+              </svg>
+            </div>
+            <p class="print-message">Imprimiendo ticket...</p>
+            <div class="progress-bar">
+              <div class="progress-fill"></div>
+            </div>
           </div>
-          <p class="print-message">Ticket impreso exitosamente</p>
-          <p class="print-submessage">Retire su ticket de la impresora</p>
-        </div>
+        } @else if (ticketImpreso) {
+          <div class="print-status success">
+            <div class="print-icon">
+              <svg
+                viewBox="0 0 24 24"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"
+                  fill="currentColor"
+                />
+              </svg>
+            </div>
+            <p class="print-message">Ticket impreso exitosamente</p>
+            <p class="print-submessage">Retire su ticket de la impresora</p>
+          </div>
+        }
       }
 
       <!-- Botones de acción -->
       <div class="result-actions">
-        <button
-          class="btn-action btn-retry"
-          *ngIf="!ticketImpreso && !imprimiendo && printerStatus === 'online'"
-          (click)="imprimirTicket()"
-        >
-          Reintentar Impresion
-        </button>
+        @if (flujoActual !== 'asistencia') {
+          <button
+            class="btn-action btn-retry"
+            *ngIf="!ticketImpreso && !imprimiendo && printerStatus === 'online'"
+            (click)="imprimirTicket()"
+          >
+            Reintentar Impresion
+          </button>
+        }
 
-        <button class="btn-action btn-primary" (click)="resetearFormulario()">
-          Nueva Verificacion
+        <button 
+          class="btn-action btn-primary" 
+          (click)="resetearFormulario()"
+          [disabled]="checkInStatus === 'loading'"
+        >
+          @if (flujoActual === 'asistencia' && checkInStatus === 'error') {
+            Reintentar
+          } @else {
+            Nueva Verificacion
+          }
         </button>
       </div>
     </div>

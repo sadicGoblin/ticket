@@ -304,7 +304,7 @@
 
       <!-- Código del ticket -->
       <div class="ticket-code-section">
-        <span class="ticket-code-label">Codigo de Ticket</span>
+        <span class="ticket-code-label">Código de Ticket</span>
         <span class="ticket-code-number">{{ seleccionado.ticketNumber }}</span>
       </div>
 
@@ -357,17 +357,17 @@
           inactividadCountdown
         }}</span>
       </div>
-      <h3 class="inactivity-title">¿Sigue ahi?</h3>
+      <h3 class="inactivity-title">¿Sigue ahí?</h3>
       <p class="inactivity-desc">
-        Su sesion se cerrara en
+        Su sesión se cerrará en
         <strong>{{ inactividadCountdown }} segundos</strong> por inactividad.
       </p>
       <div class="inactivity-actions">
         <button class="btn-mas-tiempo" (click)="confirmarMasTiempo()">
-          Si, necesito mas tiempo
+          Sí, necesito más tiempo
         </button>
         <button class="btn-cerrar-sesion" (click)="volverAlInicio()">
-          Cerrar sesion
+          Cerrar sesión
         </button>
       </div>
     </div>

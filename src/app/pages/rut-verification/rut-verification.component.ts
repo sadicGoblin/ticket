@@ -6,6 +6,10 @@ import { CasinoService, EmpleadoCasino } from '../../services/casino.service';
 import { PrinterService } from '../../services/printer.service';
 import { ConfigService } from '../../services/config.service';
 import { PrinterStatusComponent } from '../../components/printer-status/printer-status.component';
+import {
+  DailyAttendanceService,
+  CheckInResponse,
+} from '../../services/daily-attendance.service';
 
 @Component({
   selector: 'app-rut-verification',
@@ -25,6 +29,11 @@ export class RutVerificationComponent implements OnDestroy {
   printerStatus: 'unknown' | 'online' | 'offline' = 'unknown';
   flujoActual: string = '';
 
+  // Estado del check-in (flujo asistencia)
+  checkInStatus: 'idle' | 'loading' | 'success' | 'already' | 'error' = 'idle';
+  checkInMessage: string = '';
+  checkInTime: string | null = null;
+
   // Gestión de inactividad
   private inactivityTimeout: any = null;
   private countdownInterval: any = null;
@@ -40,6 +49,7 @@ export class RutVerificationComponent implements OnDestroy {
     private printerService: PrinterService,
     private router: Router,
     private configService: ConfigService,
+    private dailyAttendanceService: DailyAttendanceService,
   ) {
     this.brandName = this.configService.currentConfig.brand.name;
     this.logoUrl = this.configService.orgLogoUrl;
@@ -225,9 +235,9 @@ export class RutVerificationComponent implements OnDestroy {
             }
             this.router.navigate(['/comida-seleccion']);
           } else {
-            // Flujo de registro de asistencia - confirmar y volver
+            // Flujo de registro de asistencia - hacer check-in real
             this.empleado = respuesta.empleado;
-            return;
+            this.realizarCheckIn(respuesta.empleado);
           }
         } else {
           this.errorMensaje =
@@ -299,6 +309,84 @@ export class RutVerificationComponent implements OnDestroy {
   }
 
   /**
+   * Realiza el check-in de asistencia llamando a la API
+   */
+  realizarCheckIn(empleado: EmpleadoCasino): void {
+    // Verificar que haya al menos un evento
+    if (!empleado.eventos || empleado.eventos.length === 0) {
+      this.checkInStatus = 'error';
+      this.checkInMessage = 'No tiene eventos asignados para hoy';
+      return;
+    }
+
+    const evento = empleado.eventos[0];
+    this.checkInStatus = 'loading';
+    this.checkInMessage = 'Registrando asistencia...';
+
+    // Formatear RUT con guión para la API
+    const rutLimpio = empleado.rut.replace(/[^\dkK]/g, '');
+    const documentNumber =
+      rutLimpio.length >= 2
+        ? rutLimpio.slice(0, -1) + '-' + rutLimpio.slice(-1).toUpperCase()
+        : rutLimpio;
+
+    this.dailyAttendanceService
+      .checkIn({
+        document_number: documentNumber,
+        event_code: evento.code,
+      })
+      .subscribe({
+        next: (response: CheckInResponse) => {
+          if (response.success && response.data) {
+            this.checkInStatus = 'success';
+            this.checkInMessage = response.message || 'Asistencia registrada';
+            this.checkInTime = response.data.check_in_time;
+            console.log('✅ Check-in exitoso:', response.data);
+
+            // Auto-volver al home después de 5 segundos
+            setTimeout(() => {
+              this.resetearFormulario();
+            }, 5000);
+          } else if (response.existing_check_in) {
+            // Ya tiene check-in para hoy
+            this.checkInStatus = 'already';
+            this.checkInMessage = response.error || 'Ya registró asistencia hoy';
+            this.checkInTime = response.existing_check_in.check_in_time;
+            console.log('ℹ️ Ya tiene check-in:', response.existing_check_in);
+
+            // Auto-volver después de 5 segundos
+            setTimeout(() => {
+              this.resetearFormulario();
+            }, 5000);
+          } else {
+            this.checkInStatus = 'error';
+            this.checkInMessage = response.error || 'Error al registrar asistencia';
+          }
+        },
+        error: (error) => {
+          console.error('❌ Error en check-in:', error);
+          this.checkInStatus = 'error';
+          
+          // Manejar error de ya existente (puede venir como 400)
+          if (error.error?.existing_check_in) {
+            this.checkInStatus = 'already';
+            this.checkInMessage = 'Ya registró asistencia hoy';
+            this.checkInTime = error.error.existing_check_in.check_in_time;
+            
+            setTimeout(() => {
+              this.resetearFormulario();
+            }, 5000);
+          } else {
+            this.checkInMessage =
+              error.error?.error ||
+              error.error?.message ||
+              'Error al conectar con el servidor';
+          }
+        },
+      });
+  }
+
+  /**
    * Resetea el formulario para nueva verificación
    */
   resetearFormulario(): void {
@@ -308,6 +396,9 @@ export class RutVerificationComponent implements OnDestroy {
     this.errorMensaje = '';
     this.ticketImpreso = false;
     this.imprimiendo = false;
+    this.checkInStatus = 'idle';
+    this.checkInMessage = '';
+    this.checkInTime = null;
     this.clearInactivityTimer();
     // Volver al inicio (home)
     this.router.navigate(['/home']);

@@ -1,4 +1,4 @@
 export const environment = {
   production: true,
-  apiUrl: 'https://ticket-services.favric.cl/'
+  apiUrl: 'https://ticket-services.favric.cl/api'
 };
