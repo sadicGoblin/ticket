@@ -124,10 +124,10 @@ export class VisitorService {
    * Agregar visitante a un evento
    */
   addVisitor(data: AddVisitorRequest): Observable<AddVisitorResponse> {
-    const url = `${this.API_URL}/events/add-visitor/`;
+    const url = `${this.API_URL}/visitor/add/`;
     console.log('🚀 [VisitorService] POST', url);
     console.log('📤 Payload:', data);
-    
+
     return this.http.post<AddVisitorResponse>(url, data).pipe(
       tap({
         next: (res) => console.log('✅ [VisitorService] Response:', res),
@@ -143,9 +143,9 @@ export class VisitorService {
     const url = date
       ? `${this.API_URL}/events/?date=${date}`
       : `${this.API_URL}/events/`;
-    
+
     console.log('🚀 [VisitorService] GET', url);
-    
+
     return this.http.get<EventsApiResponse | EventToday[]>(url).pipe(
       map((response) => {
         // Manejar respuesta como array directo o paginada
@@ -163,12 +163,12 @@ export class VisitorService {
    * Verificar si existe persona con ese RUT
    */
   checkRut(documentNumber: string): Observable<CheckRutResponse> {
-    const url = `${this.API_URL}/persons/check-rut/`;
+    const url = `${this.API_URL}/person/check-rut/`;
     const payload = { document_number: documentNumber };
-    
+
     console.log('🚀 [VisitorService] POST', url);
     console.log('📤 Payload:', payload);
-    
+
     return this.http.post<CheckRutResponse>(url, payload).pipe(
       tap({
         next: (res) => console.log('✅ [VisitorService] Check RUT:', res),
@@ -180,12 +180,14 @@ export class VisitorService {
   /**
    * Validar código de supervisor antes de habilitar registro
    */
-  validateSupervisorCode(data: ValidateSupervisorCodeRequest): Observable<ValidateSupervisorCodeResponse> {
-    const url = `${this.API_URL}/events/validate-supervisor-code/`;
-    
+  validateSupervisorCode(
+    data: ValidateSupervisorCodeRequest,
+  ): Observable<ValidateSupervisorCodeResponse> {
+    const url = `${this.API_URL}/supervisor/validate-code/`;
+
     console.log('🚀 [VisitorService] POST', url);
     console.log('📤 Payload:', data);
-    
+
     return this.http.post<ValidateSupervisorCodeResponse>(url, data).pipe(
       tap({
         next: (res) => console.log('✅ [VisitorService] Validate code:', res),

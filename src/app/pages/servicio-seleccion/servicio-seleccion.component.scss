@@ -27,7 +27,7 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-    height: 80px;
+    height: 100px;
   }
 }
 
@@ -37,14 +37,14 @@
   gap: 16px;
 
   .brand-logo {
-    height: 44px;
+    height: 56px;
     width: auto;
     object-fit: contain;
   }
 
   .brand-text {
     color: var(--wm-white);
-    font-size: 2rem;
+    font-size: 2.4rem;
     font-weight: 700;
     letter-spacing: -0.02em;
   }
@@ -53,21 +53,22 @@
 .btn-back {
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 10px;
   background: rgba(255, 255, 255, 0.15);
   border: none;
-  border-radius: 8px;
+  border-radius: 12px;
   color: var(--wm-white);
-  padding: 10px 20px;
-  font-size: 1rem;
-  font-weight: 500;
+  padding: 16px 28px;
+  font-size: 1.4rem;
+  font-weight: 600;
   cursor: pointer;
   transition: all 0.2s ease;
   font-family: "Inter", sans-serif;
+  -webkit-tap-highlight-color: transparent;
 
   svg {
-    width: 18px;
-    height: 18px;
+    width: 28px;
+    height: 28px;
   }
 
   &:hover {

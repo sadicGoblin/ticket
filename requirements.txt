@@ -1,9 +1,7 @@
 Flask==3.0.0
 flask-cors==4.0.0
-
-# Para Windows
-pywin32==306
+qrcode[pil]==7.4.2
 Pillow==10.1.0
 
-# Para Linux/Mac
-python-escpos==3.0
+# Para Windows (impresion directa via win32print)
+pywin32==306

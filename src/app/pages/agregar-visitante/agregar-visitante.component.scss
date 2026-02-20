@@ -5,7 +5,11 @@
   background: var(--wm-gray-50);
   display: flex;
   flex-direction: column;
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  font-family:
+    "Inter",
+    -apple-system,
+    BlinkMacSystemFont,
+    sans-serif;
 }
 
 // Top Bar
@@ -21,7 +25,7 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-    height: 80px;
+    height: 100px;
   }
 }
 
@@ -31,14 +35,14 @@
   gap: 16px;
 
   .brand-logo {
-    height: 44px;
+    height: 56px;
     width: auto;
     object-fit: contain;
   }
 
   .brand-text {
     color: var(--wm-white);
-    font-size: 2rem;
+    font-size: 2.4rem;
     font-weight: 700;
     letter-spacing: -0.02em;
   }
@@ -48,21 +52,22 @@
 .btn-logout {
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 10px;
   background: rgba(255, 255, 255, 0.15);
   border: none;
-  border-radius: 8px;
+  border-radius: 12px;
   color: var(--wm-white);
-  padding: 10px 20px;
-  font-size: 1rem;
-  font-weight: 500;
+  padding: 16px 28px;
+  font-size: 1.4rem;
+  font-weight: 600;
   cursor: pointer;
   transition: all 0.2s ease;
-  font-family: 'Inter', sans-serif;
+  font-family: "Inter", sans-serif;
+  -webkit-tap-highlight-color: transparent;
 
   svg {
-    width: 20px;
-    height: 20px;
+    width: 28px;
+    height: 28px;
   }
 
   &:hover {
@@ -81,10 +86,10 @@
 // Main Content
 .main-content {
   flex: 1;
-  max-width: 640px;
+  max-width: 900px;
   width: 100%;
   margin: 0 auto;
-  padding: 32px 24px 48px;
+  padding: 40px 40px 48px;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -93,26 +98,26 @@
 .step-badge {
   display: inline-flex;
   align-items: center;
-  gap: 8px;
+  gap: 10px;
   background: rgba(var(--wm-blue-rgb), 0.08);
   color: var(--wm-blue);
-  padding: 8px 20px;
-  border-radius: 24px;
-  font-size: 1rem;
+  padding: 12px 28px;
+  border-radius: 28px;
+  font-size: 1.3rem;
   font-weight: 600;
-  margin-bottom: 16px;
+  margin-bottom: 20px;
 
   svg {
-    width: 20px;
-    height: 20px;
+    width: 26px;
+    height: 26px;
   }
 
   .visitors-count {
     background: var(--wm-success);
     color: white;
-    padding: 2px 10px;
-    border-radius: 12px;
-    font-size: 0.85rem;
+    padding: 4px 14px;
+    border-radius: 14px;
+    font-size: 1rem;
     margin-left: 8px;
   }
 }
@@ -123,35 +128,35 @@
   align-items: center;
   gap: 4px;
   background: rgba(var(--wm-blue-rgb), 0.08);
-  padding: 12px 24px;
-  border-radius: 12px;
-  margin-bottom: 20px;
+  padding: 14px 32px;
+  border-radius: 14px;
+  margin-bottom: 24px;
 
   .event-badge-name {
-    font-size: 1.1rem;
+    font-size: 1.4rem;
     font-weight: 700;
     color: var(--wm-blue);
   }
 
   .event-badge-user {
-    font-size: 0.9rem;
+    font-size: 1.1rem;
     color: var(--wm-gray-500);
   }
 }
 
 .step-title {
-  font-size: 2rem;
+  font-size: 2.8rem;
   font-weight: 700;
   color: var(--wm-gray-900);
-  margin: 0 0 8px;
+  margin: 0 0 12px;
   text-align: center;
 }
 
 .step-description {
-  font-size: 1.1rem;
+  font-size: 1.3rem;
   color: var(--wm-gray-500);
   text-align: center;
-  margin: 0 0 24px;
+  margin: 0 0 28px;
 }
 
 .step-content {
@@ -165,20 +170,20 @@
 .error-message {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 10px;
   background: rgba(var(--wm-error-rgb), 0.1);
   color: var(--wm-error);
-  padding: 12px 20px;
-  border-radius: 10px;
-  font-size: 1rem;
-  font-weight: 500;
-  margin-bottom: 16px;
+  padding: 16px 24px;
+  border-radius: 12px;
+  font-size: 1.2rem;
+  font-weight: 600;
+  margin-bottom: 20px;
   width: 100%;
-  max-width: 400px;
+  max-width: 580px;
 
   svg {
-    width: 20px;
-    height: 20px;
+    width: 24px;
+    height: 24px;
     flex-shrink: 0;
   }
 }
@@ -186,11 +191,11 @@
 // Input display
 .input-display {
   width: 100%;
-  max-width: 400px;
+  max-width: 580px;
   background: var(--wm-white);
   border: 2px solid var(--wm-gray-200);
-  border-radius: 12px;
-  padding: 16px 20px;
+  border-radius: 14px;
+  padding: 20px 24px;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -204,12 +209,12 @@
   }
 
   &.code-input {
-    font-family: 'Courier New', monospace;
+    font-family: "Courier New", monospace;
     letter-spacing: 0.2em;
   }
 
   .input-value {
-    font-size: 1.25rem;
+    font-size: 1.5rem;
     font-weight: 600;
     color: var(--wm-gray-900);
 
@@ -223,12 +228,13 @@
     background: var(--wm-blue);
     color: white;
     border: none;
-    padding: 8px 16px;
-    border-radius: 8px;
-    font-size: 0.9rem;
-    font-weight: 600;
+    padding: 12px 24px;
+    border-radius: 10px;
+    font-size: 1.15rem;
+    font-weight: 700;
     cursor: pointer;
     transition: all 0.2s;
+    -webkit-tap-highlight-color: transparent;
 
     &:hover {
       background: var(--wm-blue-dark);
@@ -244,35 +250,35 @@
 // Keyboard
 .keyboard {
   width: 100%;
-  max-width: 500px;
-  margin-bottom: 24px;
+  max-width: 700px;
+  margin-bottom: 28px;
 
   &.compact {
-    max-width: 400px;
+    max-width: 580px;
   }
 
   &.full {
-    max-width: 580px;
+    max-width: 780px;
   }
 
   .keyboard-row {
     display: flex;
     justify-content: center;
-    gap: 6px;
-    margin-bottom: 6px;
+    gap: 8px;
+    margin-bottom: 8px;
 
     &.actions {
-      margin-top: 4px;
+      margin-top: 6px;
     }
   }
 
   .key {
-    min-width: 44px;
-    height: 52px;
+    min-width: 58px;
+    height: 64px;
     background: var(--wm-white);
     border: 1px solid var(--wm-gray-200);
-    border-radius: 10px;
-    font-size: 1.25rem;
+    border-radius: 12px;
+    font-size: 1.5rem;
     font-weight: 600;
     color: var(--wm-gray-900);
     cursor: pointer;
@@ -280,7 +286,8 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    font-family: 'Inter', sans-serif;
+    font-family: "Inter", sans-serif;
+    -webkit-tap-highlight-color: transparent;
 
     &:hover {
       background: var(--wm-gray-50);
@@ -294,20 +301,20 @@
     }
 
     svg {
-      width: 24px;
-      height: 24px;
+      width: 28px;
+      height: 28px;
     }
 
     &.key-action {
-      min-width: 80px;
-      font-size: 0.85rem;
+      min-width: 100px;
+      font-size: 1.1rem;
       background: var(--wm-gray-100);
     }
 
     &.key-space {
       flex: 1;
-      max-width: 200px;
-      font-size: 0.9rem;
+      max-width: 260px;
+      font-size: 1.1rem;
     }
   }
 }
@@ -401,16 +408,16 @@
 // Form groups
 .form-group {
   width: 100%;
-  max-width: 400px;
-  margin-bottom: 16px;
+  max-width: 580px;
+  margin-bottom: 20px;
 }
 
 .form-label {
   display: block;
-  font-size: 0.95rem;
+  font-size: 1.15rem;
   font-weight: 600;
   color: var(--wm-gray-700);
-  margin-bottom: 8px;
+  margin-bottom: 10px;
 }
 
 // Dropdown
@@ -423,14 +430,14 @@
   width: 100%;
   background: var(--wm-white);
   border: 2px solid var(--wm-gray-200);
-  border-radius: 12px;
-  padding: 16px 20px;
+  border-radius: 14px;
+  padding: 20px 24px;
   display: flex;
   align-items: center;
   justify-content: space-between;
   cursor: pointer;
   transition: all 0.2s ease;
-  font-family: 'Inter', sans-serif;
+  font-family: "Inter", sans-serif;
   text-align: left;
 
   &:hover {
@@ -442,20 +449,20 @@
   }
 
   .dropdown-value {
-    font-size: 1.1rem;
+    font-size: 1.4rem;
     font-weight: 600;
     color: var(--wm-gray-900);
   }
 
   .dropdown-placeholder,
   .dropdown-loading {
-    font-size: 1rem;
+    font-size: 1.2rem;
     color: var(--wm-gray-400);
   }
 
   .dropdown-arrow {
-    width: 20px;
-    height: 20px;
+    width: 24px;
+    height: 24px;
     color: var(--wm-gray-400);
     transition: transform 0.2s ease;
     flex-shrink: 0;
@@ -494,16 +501,16 @@
 
 .dropdown-item {
   width: 100%;
-  padding: 14px 20px;
+  padding: 18px 24px;
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  gap: 2px;
+  gap: 4px;
   border: none;
   background: transparent;
   cursor: pointer;
   transition: background 0.15s ease;
-  font-family: 'Inter', sans-serif;
+  font-family: "Inter", sans-serif;
   text-align: left;
 
   &:hover {
@@ -519,13 +526,13 @@
   }
 
   .item-name {
-    font-size: 1rem;
+    font-size: 1.25rem;
     font-weight: 600;
     color: var(--wm-gray-900);
   }
 
   .item-location {
-    font-size: 0.85rem;
+    font-size: 1rem;
     color: var(--wm-gray-500);
   }
 }
@@ -542,13 +549,13 @@
   .btn-toggle-password {
     background: transparent;
     border: none;
-    padding: 8px;
+    padding: 10px;
     cursor: pointer;
     color: var(--wm-gray-400);
     display: flex;
     align-items: center;
     justify-content: center;
-    border-radius: 8px;
+    border-radius: 10px;
     transition: all 0.2s ease;
 
     &:hover {
@@ -557,8 +564,8 @@
     }
 
     svg {
-      width: 22px;
-      height: 22px;
+      width: 28px;
+      height: 28px;
     }
   }
 }
@@ -576,15 +583,36 @@
 .person-found {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 10px;
   color: var(--wm-success);
-  font-size: 0.95rem;
-  font-weight: 500;
-  margin-top: 8px;
+  font-size: 1.2rem;
+  font-weight: 600;
+  margin-top: 10px;
 
   svg {
-    width: 20px;
-    height: 20px;
+    width: 24px;
+    height: 24px;
+  }
+}
+
+.rut-not-found {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: rgba(var(--wm-warning-rgb, 245, 124, 0), 0.08);
+  color: var(--wm-warning, #f57c00);
+  padding: 14px 20px;
+  border-radius: 12px;
+  font-size: 1.1rem;
+  font-weight: 600;
+  margin-bottom: 16px;
+  width: 100%;
+  max-width: 580px;
+
+  svg {
+    width: 24px;
+    height: 24px;
+    flex-shrink: 0;
   }
 }
 
@@ -597,13 +625,13 @@
 // Buttons
 .btn-primary {
   width: 100%;
-  max-width: 400px;
+  max-width: 580px;
   background: var(--wm-blue);
   color: white;
   border: none;
-  border-radius: 12px;
-  padding: 16px 32px;
-  font-size: 1.1rem;
+  border-radius: 14px;
+  padding: 22px 32px;
+  font-size: 1.4rem;
   font-weight: 700;
   cursor: pointer;
   transition: all 0.2s;
@@ -611,7 +639,7 @@
   align-items: center;
   justify-content: center;
   gap: 8px;
-  font-family: 'Inter', sans-serif;
+  font-family: "Inter", sans-serif;
 
   &:hover:not(:disabled) {
     background: var(--wm-blue-dark);
@@ -635,17 +663,17 @@
 
 .btn-secondary {
   width: 100%;
-  max-width: 400px;
+  max-width: 580px;
   background: var(--wm-white);
   color: var(--wm-gray-700);
   border: 2px solid var(--wm-gray-200);
-  border-radius: 12px;
-  padding: 14px 32px;
-  font-size: 1.1rem;
+  border-radius: 14px;
+  padding: 20px 32px;
+  font-size: 1.4rem;
   font-weight: 600;
   cursor: pointer;
   transition: all 0.2s;
-  font-family: 'Inter', sans-serif;
+  font-family: "Inter", sans-serif;
 
   &:hover {
     border-color: var(--wm-blue);
@@ -655,29 +683,29 @@
 
 // Success / Confirmation
 .success-icon-wrap {
-  width: 80px;
-  height: 80px;
+  width: 100px;
+  height: 100px;
   background: rgba(var(--wm-success-rgb), 0.1);
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-  margin-bottom: 24px;
+  margin-bottom: 28px;
 
   svg {
-    width: 48px;
-    height: 48px;
+    width: 60px;
+    height: 60px;
     color: var(--wm-success);
   }
 }
 
 .visitor-info {
   width: 100%;
-  max-width: 400px;
+  max-width: 580px;
   background: var(--wm-white);
-  border-radius: 12px;
-  padding: 4px 20px;
-  margin-bottom: 20px;
+  border-radius: 14px;
+  padding: 4px 24px;
+  margin-bottom: 24px;
   border: 1px solid var(--wm-gray-200);
 }
 
@@ -685,7 +713,7 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 14px 0;
+  padding: 18px 0;
   border-bottom: 1px solid var(--wm-gray-200);
 
   &:last-child {
@@ -694,9 +722,9 @@
 
   &.highlight {
     background: rgba(var(--wm-blue-rgb), 0.04);
-    margin: 0 -20px;
-    padding: 14px 20px;
-    border-radius: 8px;
+    margin: 0 -24px;
+    padding: 18px 24px;
+    border-radius: 10px;
     border-bottom: none;
 
     .info-value {
@@ -706,12 +734,12 @@
   }
 
   .info-label {
-    font-size: 0.95rem;
+    font-size: 1.15rem;
     color: var(--wm-gray-500);
   }
 
   .info-value {
-    font-size: 1rem;
+    font-size: 1.3rem;
     font-weight: 600;
     color: var(--wm-gray-900);
     text-align: right;
@@ -720,13 +748,13 @@
 
 .tickets-list {
   width: 100%;
-  max-width: 400px;
-  margin-bottom: 24px;
+  max-width: 580px;
+  margin-bottom: 28px;
 
   h4 {
-    font-size: 0.95rem;
+    font-size: 1.15rem;
     color: var(--wm-gray-500);
-    margin: 0 0 12px;
+    margin: 0 0 14px;
   }
 
   .ticket-item {
@@ -735,29 +763,30 @@
     align-items: center;
     background: var(--wm-white);
     border: 1px solid var(--wm-gray-200);
-    border-radius: 8px;
-    padding: 12px 16px;
-    margin-bottom: 8px;
+    border-radius: 12px;
+    padding: 18px 22px;
+    margin-bottom: 10px;
 
     .ticket-service {
       font-weight: 600;
+      font-size: 1.2rem;
       color: var(--wm-gray-900);
     }
 
     .ticket-number {
-      font-size: 0.85rem;
+      font-size: 1rem;
       color: var(--wm-gray-400);
-      font-family: 'Courier New', monospace;
+      font-family: "Courier New", monospace;
     }
   }
 }
 
 .confirmation-actions {
   width: 100%;
-  max-width: 400px;
+  max-width: 580px;
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 14px;
 }
 
 @keyframes spin {
@@ -828,13 +857,23 @@
 }
 
 @keyframes fadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }
 
 @keyframes scaleIn {
-  from { transform: scale(0.9); opacity: 0; }
-  to { transform: scale(1); opacity: 1; }
+  from {
+    transform: scale(0.9);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
 }
 
 // Button secondary with icon
@@ -842,10 +881,10 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 8px;
+  gap: 10px;
 
   svg {
-    width: 20px;
-    height: 20px;
+    width: 24px;
+    height: 24px;
   }
 }

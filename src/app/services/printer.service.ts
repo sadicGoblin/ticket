@@ -13,8 +13,11 @@ export interface DatosTicket {
   total?: number;
   nombreImpresora?: string;
   numeroPedido?: string;
+  ticketNumber?: string;
+  brandName?: string;
   rut?: string;
   nombreCliente?: string;
+  eventoNombre?: string;
 }
 
 export interface RespuestaImpresion {
@@ -23,7 +26,7 @@ export interface RespuestaImpresion {
 }
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class PrinterService {
   private readonly PRINTER_URL = 'http://127.0.0.1:8000';
@@ -40,21 +43,30 @@ export class PrinterService {
    * @returns Observable con la respuesta del servidor de impresión
    */
   imprimirTicket(
-    productos: ProductoTicket[], 
-    nombreImpresora?: string, 
+    productos: ProductoTicket[],
+    nombreImpresora?: string,
     numeroPedido?: string,
     rut?: string,
-    nombreCliente?: string
+    nombreCliente?: string,
+    ticketNumber?: string,
+    brandName?: string,
+    eventoNombre?: string,
   ): Observable<RespuestaImpresion> {
     const datosTicket: DatosTicket = {
       productos: productos,
       nombreImpresora: nombreImpresora,
       numeroPedido: numeroPedido,
+      ticketNumber: ticketNumber,
+      brandName: brandName,
       rut: rut,
-      nombreCliente: nombreCliente
+      nombreCliente: nombreCliente,
+      eventoNombre: eventoNombre,
     };
 
-    return this.http.post<RespuestaImpresion>(`${this.PRINTER_URL}/imprimir`, datosTicket);
+    return this.http.post<RespuestaImpresion>(
+      `${this.PRINTER_URL}/imprimir`,
+      datosTicket,
+    );
   }
 
   /**
@@ -72,18 +84,27 @@ export class PrinterService {
    * @param tipoComida Tipo de comida (almuerzo, cena, etc.)
    * @returns Observable con la respuesta del servidor de impresión
    */
-  imprimirTicketCasino(rut: string, nombreCliente: string, tipoComida: string): Observable<RespuestaImpresion> {
+  imprimirTicketCasino(
+    rut: string,
+    nombreCliente: string,
+    tipoComida: string,
+  ): Observable<RespuestaImpresion> {
     const datosTicket: DatosTicket = {
-      productos: [{
-        nombre: `Ticket de ${tipoComida}`,
-        cantidad: 1,
-        precio: 0
-      }],
+      productos: [
+        {
+          nombre: `Ticket de ${tipoComida}`,
+          cantidad: 1,
+          precio: 0,
+        },
+      ],
       rut: rut,
       nombreCliente: nombreCliente,
-      numeroPedido: new Date().getTime().toString()
+      numeroPedido: new Date().getTime().toString(),
     };
 
-    return this.http.post<RespuestaImpresion>(`${this.PRINTER_URL}/imprimir-casino`, datosTicket);
+    return this.http.post<RespuestaImpresion>(
+      `${this.PRINTER_URL}/imprimir-casino`,
+      datosTicket,
+    );
   }
 }

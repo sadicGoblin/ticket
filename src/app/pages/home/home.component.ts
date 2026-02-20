@@ -38,7 +38,7 @@ export class HomeComponent {
 
   seleccionarFlujo(flujo: 'ticket' | 'asistencia' | 'visitante'): void {
     sessionStorage.setItem('flujoActual', flujo);
-    
+
     if (flujo === 'visitante') {
       this.router.navigate(['/agregar-visitante']);
     } else {
@@ -99,10 +99,15 @@ export class HomeComponent {
     this.passwordError = '';
   }
 
+  private getAdminCode(): string {
+    const day = new Date().getDate().toString().padStart(2, '0');
+    return '00' + day;
+  }
+
   confirmarAccion(): void {
-    if (this.adminPassword === '1234') {
+    if (this.adminPassword === this.getAdminCode()) {
       this.showPasswordModal = false;
-      
+
       if (this.pendingAction === 'salir') {
         // Salir del modo kiosko: cerrar la ventana o navegar fuera
         window.close();
@@ -118,7 +123,7 @@ export class HomeComponent {
       } else if (this.pendingAction === 'configurar') {
         this.router.navigate(['/setup'], { queryParams: { reconfig: '1' } });
       }
-      
+
       this.pendingAction = null;
     } else {
       this.passwordError = 'Clave incorrecta';

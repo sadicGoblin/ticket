@@ -24,7 +24,7 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-    height: 80px;
+    height: 100px;
   }
 }
 
@@ -34,14 +34,14 @@
   gap: 16px;
 
   .brand-logo {
-    height: 44px;
+    height: 56px;
     width: auto;
     object-fit: contain;
   }
 
   .brand-text {
     color: var(--wm-white);
-    font-size: 2rem;
+    font-size: 2.4rem;
     font-weight: 700;
     letter-spacing: -0.02em;
   }
@@ -55,7 +55,7 @@
   align-items: center;
   justify-content: center;
   padding: 60px 48px;
-  max-width: 900px;
+  max-width: 1000px;
   margin: 0 auto;
   width: 100%;
 }
@@ -67,15 +67,15 @@
   animation: fadeInDown 0.5s ease;
 
   h1 {
-    font-size: 3.5rem;
+    font-size: 4.5rem;
     font-weight: 800;
     color: var(--wm-gray-900);
-    margin: 0 0 12px;
+    margin: 0 0 16px;
     letter-spacing: -0.03em;
   }
 
   .welcome-desc {
-    font-size: 1.4rem;
+    font-size: 1.8rem;
     color: var(--wm-gray-500);
     margin: 0;
     font-weight: 400;
@@ -86,25 +86,26 @@
 .cards-container {
   display: flex;
   flex-direction: column;
-  gap: 20px;
+  gap: 24px;
   width: 100%;
-  max-width: 700px;
+  max-width: 850px;
   animation: fadeInUp 0.5s ease;
 }
 
 .flow-card {
   display: flex;
   align-items: center;
-  gap: 28px;
+  gap: 32px;
   background: var(--wm-white);
   border: 2px solid var(--wm-gray-200);
-  border-radius: 20px;
-  padding: 36px 40px;
+  border-radius: 24px;
+  padding: 44px 48px;
   cursor: pointer;
   transition: all 0.2s ease;
   text-align: left;
   font-family: "Inter", sans-serif;
   width: 100%;
+  -webkit-tap-highlight-color: transparent;
 
   &:hover {
     border-color: var(--wm-blue);
@@ -119,18 +120,18 @@
   }
 
   .card-icon {
-    width: 72px;
-    height: 72px;
+    width: 88px;
+    height: 88px;
     background: rgba(var(--wm-blue-rgb), 0.08);
-    border-radius: 18px;
+    border-radius: 22px;
     display: flex;
     align-items: center;
     justify-content: center;
     flex-shrink: 0;
 
     svg {
-      width: 38px;
-      height: 38px;
+      width: 46px;
+      height: 46px;
       color: var(--wm-blue);
     }
   }
@@ -139,15 +140,15 @@
     flex: 1;
 
     h2 {
-      font-size: 1.6rem;
+      font-size: 2rem;
       font-weight: 700;
       color: var(--wm-gray-900);
-      margin: 0 0 6px;
+      margin: 0 0 8px;
       letter-spacing: -0.01em;
     }
 
     p {
-      font-size: 1.05rem;
+      font-size: 1.3rem;
       color: var(--wm-gray-400);
       margin: 0;
       font-weight: 400;
@@ -155,8 +156,8 @@
   }
 
   .card-arrow {
-    width: 28px;
-    height: 28px;
+    width: 36px;
+    height: 36px;
     color: var(--wm-gray-400);
     flex-shrink: 0;
     transition: color 0.2s ease;
@@ -329,24 +330,24 @@
 /* Password modal */
 .password-panel {
   background: var(--wm-white);
-  border-radius: 20px;
-  padding: 32px;
+  border-radius: 24px;
+  padding: 40px;
   width: 90%;
-  max-width: 380px;
+  max-width: 480px;
   box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
   text-align: center;
 
   h3 {
-    font-size: 1.3rem;
+    font-size: 1.8rem;
     font-weight: 700;
     color: var(--wm-gray-900);
-    margin: 0 0 8px;
+    margin: 0 0 10px;
   }
 
   p {
-    font-size: 0.95rem;
+    font-size: 1.15rem;
     color: var(--wm-gray-500);
-    margin: 0 0 20px;
+    margin: 0 0 24px;
   }
 }
 
@@ -366,8 +367,8 @@
 }
 
 .pin-dot {
-  width: 16px;
-  height: 16px;
+  width: 22px;
+  height: 22px;
   border-radius: 50%;
   border: 2px solid var(--wm-gray-200);
   transition: all 0.15s ease;
@@ -386,20 +387,20 @@
 .numpad {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 8px;
-  margin-top: 16px;
-  max-width: 280px;
+  gap: 10px;
+  margin-top: 20px;
+  max-width: 360px;
   margin-left: auto;
   margin-right: auto;
 }
 
 .numpad-key {
-  height: 56px;
+  height: 72px;
   border: none;
-  border-radius: 12px;
+  border-radius: 14px;
   background: var(--wm-gray-50);
   color: var(--wm-gray-900);
-  font-size: 1.4rem;
+  font-size: 1.8rem;
   font-weight: 600;
   cursor: pointer;
   transition: all 0.1s ease;
@@ -416,15 +417,15 @@
   }
 
   svg {
-    width: 22px;
-    height: 22px;
+    width: 28px;
+    height: 28px;
   }
 }
 
 .numpad-key-action {
   background: var(--wm-gray-200);
   color: var(--wm-gray-500);
-  font-size: 0.85rem;
+  font-size: 1rem;
 
   &:active {
     background: var(--wm-gray-400);
@@ -441,7 +442,63 @@
   }
 }
 
-/* Responsive (smaller kiosks or tablets) */
+/* Kiosk portrait 1080x1920 */
+@media (min-height: 1200px) {
+  .main-content {
+    padding: 80px 60px;
+    max-width: 100%;
+  }
+
+  .welcome-section {
+    margin-bottom: 80px;
+
+    h1 {
+      font-size: 5.5rem;
+    }
+
+    .welcome-desc {
+      font-size: 2.2rem;
+    }
+  }
+
+  .cards-container {
+    max-width: 90%;
+    gap: 28px;
+  }
+
+  .flow-card {
+    padding: 52px 56px;
+    border-radius: 28px;
+    gap: 36px;
+
+    .card-icon {
+      width: 100px;
+      height: 100px;
+
+      svg {
+        width: 54px;
+        height: 54px;
+      }
+    }
+
+    .card-text {
+      h2 {
+        font-size: 2.4rem;
+      }
+
+      p {
+        font-size: 1.5rem;
+      }
+    }
+
+    .card-arrow {
+      width: 42px;
+      height: 42px;
+    }
+  }
+}
+
+/* Responsive (smaller screens) */
 @media (max-width: 768px) {
   .top-bar {
     padding: 0 24px;

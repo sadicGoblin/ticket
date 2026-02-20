@@ -27,7 +27,7 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-    height: 80px;
+    height: 100px;
   }
 }
 
@@ -37,14 +37,14 @@
   gap: 16px;
 
   .brand-logo {
-    height: 44px;
+    height: 56px;
     width: auto;
     object-fit: contain;
   }
 
   .brand-text {
     color: var(--wm-white);
-    font-size: 2rem;
+    font-size: 2.4rem;
     font-weight: 700;
     letter-spacing: -0.02em;
   }
@@ -53,21 +53,22 @@
 .btn-back {
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 10px;
   background: rgba(255, 255, 255, 0.15);
   border: none;
-  border-radius: 8px;
+  border-radius: 12px;
   color: var(--wm-white);
-  padding: 10px 20px;
-  font-size: 1rem;
-  font-weight: 500;
+  padding: 16px 28px;
+  font-size: 1.4rem;
+  font-weight: 600;
   cursor: pointer;
   transition: all 0.2s ease;
   font-family: "Inter", sans-serif;
+  -webkit-tap-highlight-color: transparent;
 
   svg {
-    width: 20px;
-    height: 20px;
+    width: 28px;
+    height: 28px;
   }
 
   &:hover {
@@ -79,7 +80,7 @@
 .main-content {
   width: 100%;
   max-width: 1200px;
-  padding: 64px 48px 160px;
+  padding: 48px 48px 160px;
   animation: fadeInUp 0.4s ease;
 }
 
@@ -87,17 +88,17 @@
 .user-badge {
   display: flex;
   align-items: center;
-  gap: 18px;
+  gap: 22px;
   background: var(--wm-white);
-  padding: 20px 24px;
-  border-radius: 14px;
+  padding: 28px 32px;
+  border-radius: 18px;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
-  margin-bottom: 32px;
+  margin-bottom: 36px;
   border: 1px solid var(--wm-gray-200);
 
   .user-avatar {
-    width: 52px;
-    height: 52px;
+    width: 64px;
+    height: 64px;
     background: rgba(var(--wm-blue-rgb), 0.08);
     border-radius: 50%;
     display: flex;
@@ -106,8 +107,8 @@
     flex-shrink: 0;
 
     svg {
-      width: 28px;
-      height: 28px;
+      width: 34px;
+      height: 34px;
       color: var(--wm-blue);
     }
   }
@@ -121,14 +122,14 @@
     .user-name {
       font-weight: 600;
       color: var(--wm-gray-900);
-      font-size: 1.4rem;
+      font-size: 1.8rem;
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
     }
 
     .user-rut {
-      font-size: 1.1rem;
+      font-size: 1.3rem;
       color: var(--wm-gray-500);
       font-weight: 500;
       font-family: "Inter", monospace;
@@ -139,18 +140,18 @@
 
 /* Section Header */
 .section-header {
-  margin-bottom: 20px;
+  margin-bottom: 28px;
 
   .section-title {
-    font-size: 2.6rem;
+    font-size: 3rem;
     font-weight: 700;
     color: var(--wm-gray-900);
-    margin: 0 0 8px;
+    margin: 0 0 10px;
     letter-spacing: -0.02em;
   }
 
   .section-desc {
-    font-size: 1.3rem;
+    font-size: 1.5rem;
     color: var(--wm-gray-500);
     margin: 0;
   }
@@ -159,25 +160,26 @@
 /* Grid de opciones */
 .comida-grid {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 16px;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 24px;
   width: 100%;
 }
 
 .comida-card {
   background: var(--wm-white);
-  padding: 40px 24px;
-  border-radius: 18px;
+  padding: 48px 28px;
+  border-radius: 22px;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 10px;
+  gap: 14px;
   cursor: pointer;
   transition: all 0.2s ease;
   position: relative;
   border: 2px solid var(--wm-gray-200);
   font-family: "Inter", sans-serif;
   text-align: center;
+  -webkit-tap-highlight-color: transparent;
 
   &.disponible {
     .icon-container {
@@ -343,43 +345,43 @@
   }
 
   .icon-container {
-    width: 80px;
-    height: 80px;
+    width: 100px;
+    height: 100px;
     background: rgba(var(--wm-blue-rgb), 0.06);
-    border-radius: 14px;
+    border-radius: 18px;
     display: flex;
     align-items: center;
     justify-content: center;
     transition: all 0.2s ease;
 
     svg {
-      width: 40px;
-      height: 40px;
+      width: 52px;
+      height: 52px;
     }
 
     .service-icon-img {
-      width: 40px;
-      height: 40px;
+      width: 52px;
+      height: 52px;
       object-fit: contain;
     }
   }
 
   .comida-nombre {
-    font-size: 1.4rem;
+    font-size: 1.8rem;
     font-weight: 600;
     margin: 0;
     transition: all 0.2s ease;
   }
 
   .comida-horario-rango {
-    font-size: 0.95rem;
+    font-size: 1.2rem;
     color: var(--wm-gray-400);
     font-weight: 500;
     letter-spacing: 0.5px;
   }
 
   .comida-estado {
-    font-size: 1rem;
+    font-size: 1.2rem;
     color: var(--wm-gray-400);
     font-weight: 400;
 
@@ -439,12 +441,12 @@
 
 .btn-confirmar {
   width: 100%;
-  max-width: 800px;
-  padding: 22px;
-  font-size: 1.4rem;
+  max-width: 900px;
+  padding: 28px;
+  font-size: 1.8rem;
   font-weight: 700;
   border: none;
-  border-radius: 12px;
+  border-radius: 16px;
   background: var(--wm-blue);
   color: var(--wm-white);
   cursor: pointer;
@@ -452,6 +454,7 @@
   text-transform: uppercase;
   letter-spacing: 0.5px;
   font-family: "Inter", sans-serif;
+  -webkit-tap-highlight-color: transparent;
 
   &:hover:not(:disabled) {
     background: var(--wm-blue-dark);
@@ -486,9 +489,9 @@
 
 .ticket-preview {
   background: var(--wm-white);
-  border-radius: 20px;
+  border-radius: 24px;
   width: 100%;
-  max-width: 420px;
+  max-width: 560px;
   overflow: hidden;
   box-shadow: 0 24px 80px rgba(0, 0, 0, 0.25);
   animation: scaleIn 0.25s ease;
@@ -523,27 +526,27 @@
 
   .ticket-header {
     background: var(--wm-blue);
-    padding: 28px 24px 20px;
+    padding: 36px 28px 24px;
     text-align: center;
 
     .ticket-logo {
-      height: 36px;
+      height: 44px;
       width: auto;
       object-fit: contain;
-      margin-bottom: 8px;
+      margin-bottom: 10px;
     }
 
     .ticket-org-name {
       color: var(--wm-white);
-      font-size: 1.3rem;
+      font-size: 1.6rem;
       font-weight: 700;
       margin: 0;
     }
 
     .ticket-event-name {
       color: rgba(255, 255, 255, 0.7);
-      font-size: 0.85rem;
-      margin: 4px 0 0;
+      font-size: 1rem;
+      margin: 6px 0 0;
       font-weight: 500;
     }
   }
@@ -561,13 +564,13 @@
   }
 
   .ticket-body {
-    padding: 20px 24px;
+    padding: 24px 28px;
 
     .ticket-row {
       display: flex;
       justify-content: space-between;
       align-items: baseline;
-      padding: 8px 0;
+      padding: 12px 0;
 
       &:not(:last-child) {
         border-bottom: 1px solid rgba(0, 0, 0, 0.04);
@@ -575,7 +578,7 @@
     }
 
     .ticket-label {
-      font-size: 0.85rem;
+      font-size: 1.1rem;
       color: var(--wm-gray-500);
       font-weight: 500;
       flex-shrink: 0;
@@ -583,13 +586,13 @@
     }
 
     .ticket-value {
-      font-size: 0.95rem;
+      font-size: 1.2rem;
       color: var(--wm-gray-900);
       font-weight: 600;
       text-align: right;
 
       &.servicio-name {
-        font-size: 1.1rem;
+        font-size: 1.4rem;
         color: var(--wm-blue);
         font-weight: 700;
       }
@@ -602,34 +605,34 @@
   }
 
   .ticket-qr-section {
-    padding: 16px 24px 8px;
+    padding: 20px 28px 12px;
     text-align: center;
 
     .ticket-qr-img {
-      width: 180px;
-      height: 180px;
-      border-radius: 8px;
+      width: 220px;
+      height: 220px;
+      border-radius: 10px;
       border: 1px solid var(--wm-gray-200);
     }
   }
 
   .ticket-code-section {
-    padding: 8px 24px 16px;
+    padding: 10px 28px 20px;
     text-align: center;
 
     .ticket-code-label {
       display: block;
-      font-size: 0.75rem;
+      font-size: 0.95rem;
       color: var(--wm-gray-400);
       text-transform: uppercase;
       letter-spacing: 1px;
       font-weight: 600;
-      margin-bottom: 8px;
+      margin-bottom: 10px;
     }
 
     .ticket-code-number {
       display: block;
-      font-size: 1.3rem;
+      font-size: 1.5rem;
       font-weight: 800;
       color: var(--wm-gray-900);
       font-family: "Inter", monospace;
@@ -639,15 +642,31 @@
   }
 
   .ticket-actions {
-    padding: 20px 24px 24px;
+    padding: 24px 28px 28px;
     display: flex;
     flex-direction: column;
-    gap: 10px;
+    gap: 12px;
+
+    .spinner-btn {
+      width: 22px;
+      height: 22px;
+      border: 3px solid rgba(255, 255, 255, 0.3);
+      border-top-color: white;
+      border-radius: 50%;
+      animation: spin 0.7s linear infinite;
+      flex-shrink: 0;
+    }
+
+    @keyframes spin {
+      to {
+        transform: rotate(360deg);
+      }
+    }
 
     .btn-imprimir {
       width: 100%;
-      padding: 16px;
-      font-size: 1.1rem;
+      padding: 20px;
+      font-size: 1.4rem;
       font-weight: 700;
       border: none;
       border-radius: 12px;
@@ -680,11 +699,11 @@
 
     .btn-cancelar-preview {
       width: 100%;
-      padding: 14px;
-      font-size: 1rem;
+      padding: 20px;
+      font-size: 1.4rem;
       font-weight: 600;
       border: 2px solid var(--wm-blue);
-      border-radius: 12px;
+      border-radius: 14px;
       background: transparent;
       color: var(--wm-blue);
       cursor: pointer;
@@ -692,29 +711,36 @@
       text-transform: uppercase;
       letter-spacing: 0.5px;
       font-family: "Inter", sans-serif;
+      -webkit-tap-highlight-color: transparent;
 
       &:hover {
         background: rgba(var(--wm-blue-rgb), 0.06);
+      }
+
+      &:disabled {
+        opacity: 0.4;
+        cursor: not-allowed;
       }
     }
 
     .btn-terminar {
       width: 100%;
-      padding: 14px;
-      font-size: 1rem;
-      font-weight: 600;
-      border: 1px solid var(--wm-gray-200);
-      border-radius: 12px;
-      background: var(--wm-gray-50);
-      color: var(--wm-gray-500);
+      padding: 20px;
+      font-size: 1.4rem;
+      font-weight: 700;
+      border: none;
+      border-radius: 14px;
+      background: var(--wm-success, #22c55e);
+      color: var(--wm-white);
       cursor: pointer;
       transition: all 0.2s ease;
       text-transform: uppercase;
       letter-spacing: 0.5px;
       font-family: "Inter", sans-serif;
+      -webkit-tap-highlight-color: transparent;
 
       &:hover {
-        background: var(--wm-gray-200);
+        filter: brightness(0.9);
       }
     }
   }
@@ -1036,7 +1062,111 @@
   }
 }
 
-/* Responsive */
+/* Kiosk portrait 1080x1920 */
+@media (min-height: 1200px) {
+  .main-content {
+    padding: 48px 60px 180px;
+    max-width: 100%;
+  }
+
+  .user-badge {
+    padding: 32px 36px;
+
+    .user-avatar {
+      width: 76px;
+      height: 76px;
+
+      svg {
+        width: 40px;
+        height: 40px;
+      }
+    }
+
+    .user-details .user-name {
+      font-size: 2.2rem;
+    }
+
+    .user-details .user-rut {
+      font-size: 1.5rem;
+    }
+  }
+
+  .section-header {
+    .section-title {
+      font-size: 3.5rem;
+    }
+
+    .section-desc {
+      font-size: 1.8rem;
+    }
+  }
+
+  .comida-grid {
+    gap: 28px;
+  }
+
+  .comida-card {
+    padding: 56px 32px;
+    border-radius: 26px;
+
+    .icon-container {
+      width: 120px;
+      height: 120px;
+
+      svg {
+        width: 64px;
+        height: 64px;
+      }
+
+      .service-icon-img {
+        width: 64px;
+        height: 64px;
+      }
+    }
+
+    .comida-nombre {
+      font-size: 2.2rem;
+    }
+
+    .comida-horario-rango {
+      font-size: 1.4rem;
+    }
+
+    .comida-estado {
+      font-size: 1.4rem;
+    }
+  }
+
+  .btn-confirmar {
+    padding: 34px;
+    font-size: 2.2rem;
+    border-radius: 18px;
+  }
+
+  .ticket-preview {
+    max-width: 640px;
+
+    .ticket-body .ticket-label {
+      font-size: 1.3rem;
+    }
+
+    .ticket-body .ticket-value {
+      font-size: 1.4rem;
+    }
+
+    .ticket-qr-section .ticket-qr-img {
+      width: 260px;
+      height: 260px;
+    }
+
+    .ticket-actions .btn-imprimir {
+      padding: 24px;
+      font-size: 1.6rem;
+    }
+  }
+}
+
+/* Responsive (smaller screens) */
 @media (max-width: 768px) {
   .main-content {
     padding: 24px 16px 110px;

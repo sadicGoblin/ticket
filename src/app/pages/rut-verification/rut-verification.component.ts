@@ -289,6 +289,8 @@ export class RutVerificationComponent implements OnDestroy {
         numeroPedido,
         this.empleado.rut,
         this.empleado.nombre,
+        numeroPedido,
+        this.brandName,
       )
       .subscribe({
         next: (respuesta) => {
@@ -319,7 +321,10 @@ export class RutVerificationComponent implements OnDestroy {
   /**
    * Verifica si el usuario tiene check-in antes de ir a ticket casino
    */
-  private verificarCheckInParaTicket(empleado: EmpleadoCasino, evento: ApiEvent): void {
+  private verificarCheckInParaTicket(
+    empleado: EmpleadoCasino,
+    evento: ApiEvent,
+  ): void {
     const rutLimpio = empleado.rut.replace(/[^\dkK]/g, '');
     const documentNumber =
       rutLimpio.length >= 2
@@ -327,7 +332,10 @@ export class RutVerificationComponent implements OnDestroy {
         : rutLimpio;
 
     this.pendingEventCode = evento.code;
-    console.log('🔍 Verificando check-in para ticket. check_in_required:', evento.check_in_required);
+    console.log(
+      '🔍 Verificando check-in para ticket. check_in_required:',
+      evento.check_in_required,
+    );
 
     this.dailyAttendanceService
       .verifyCheckIn(documentNumber, evento.code)
@@ -337,7 +345,9 @@ export class RutVerificationComponent implements OnDestroy {
 
           if (verification.has_check_in) {
             // Ya tiene check-in, puede continuar
-            console.log('✅ Usuario ya tiene check-in, continuando a selección');
+            console.log(
+              '✅ Usuario ya tiene check-in, continuando a selección',
+            );
             this.router.navigate(['/comida-seleccion']);
           } else {
             // No tiene check-in
@@ -351,7 +361,8 @@ export class RutVerificationComponent implements OnDestroy {
               this.requiresCheckIn = true;
               this.checkInVerified = true;
               this.checkInStatus = 'idle';
-              this.checkInMessage = 'Debe registrar su asistencia antes de obtener tickets';
+              this.checkInMessage =
+                'Debe registrar su asistencia antes de obtener tickets';
             }
           }
         },
@@ -365,7 +376,8 @@ export class RutVerificationComponent implements OnDestroy {
             // Modo restrictivo: mostrar opción de registrarse
             this.requiresCheckIn = true;
             this.checkInVerified = true;
-            this.checkInMessage = 'Debe registrar su asistencia antes de obtener tickets';
+            this.checkInMessage =
+              'Debe registrar su asistencia antes de obtener tickets';
           }
         },
       });
@@ -374,7 +386,10 @@ export class RutVerificationComponent implements OnDestroy {
   /**
    * Realiza check-in automático (modo permisivo)
    */
-  private realizarCheckInAutomatico(empleado: EmpleadoCasino, evento: ApiEvent): void {
+  private realizarCheckInAutomatico(
+    empleado: EmpleadoCasino,
+    evento: ApiEvent,
+  ): void {
     const rutLimpio = empleado.rut.replace(/[^\dkK]/g, '');
     const documentNumber =
       rutLimpio.length >= 2
@@ -403,7 +418,9 @@ export class RutVerificationComponent implements OnDestroy {
             this.router.navigate(['/comida-seleccion']);
           } else {
             // Continuar de todos modos en modo permisivo
-            console.log('⚠️ Error en check-in auto, continuando de todos modos');
+            console.log(
+              '⚠️ Error en check-in auto, continuando de todos modos',
+            );
             this.router.navigate(['/comida-seleccion']);
           }
         },
@@ -452,7 +469,8 @@ export class RutVerificationComponent implements OnDestroy {
             this.router.navigate(['/comida-seleccion']);
           } else {
             this.checkInStatus = 'error';
-            this.checkInMessage = error.error?.error || 'Error al registrar asistencia';
+            this.checkInMessage =
+              error.error?.error || 'Error al registrar asistencia';
           }
         },
       });
@@ -500,7 +518,8 @@ export class RutVerificationComponent implements OnDestroy {
           } else if (response.existing_check_in) {
             // Ya tiene check-in para hoy
             this.checkInStatus = 'already';
-            this.checkInMessage = response.error || 'Ya registró asistencia hoy';
+            this.checkInMessage =
+              response.error || 'Ya registró asistencia hoy';
             this.checkInTime = response.existing_check_in.check_in_time;
             console.log('ℹ️ Ya tiene check-in:', response.existing_check_in);
 
@@ -510,19 +529,20 @@ export class RutVerificationComponent implements OnDestroy {
             }, 5000);
           } else {
             this.checkInStatus = 'error';
-            this.checkInMessage = response.error || 'Error al registrar asistencia';
+            this.checkInMessage =
+              response.error || 'Error al registrar asistencia';
           }
         },
         error: (error) => {
           console.error('❌ Error en check-in:', error);
           this.checkInStatus = 'error';
-          
+
           // Manejar error de ya existente (puede venir como 400)
           if (error.error?.existing_check_in) {
             this.checkInStatus = 'already';
             this.checkInMessage = 'Ya registró asistencia hoy';
             this.checkInTime = error.error.existing_check_in.check_in_time;
-            
+
             setTimeout(() => {
               this.resetearFormulario();
             }, 5000);

@@ -1,16 +1,73 @@
-from flask import Flask, request, jsonify
-from flask_cors import CORS
+import sys
+import os
+import logging
 from datetime import datetime
-import win32print
-import win32api
+
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s [%(levelname)s] %(message)s',
+    datefmt='%H:%M:%S'
+)
+
+print("")
+print("=" * 50)
+print("  PLUGIN DE IMPRESION - Iniciando...")
+print("=" * 50)
+print("")
+
+# Verificar dependencias antes de importar
+try:
+    from flask import Flask, request, jsonify
+    print("  [OK] Flask encontrado")
+except ImportError:
+    print("  [ERROR] Flask no esta instalado.")
+    print("  Ejecute: pip install flask flask-cors")
+    print("")
+    input("  Presione Enter para cerrar...")
+    sys.exit(1)
+
+try:
+    from flask_cors import CORS
+    print("  [OK] Flask-CORS encontrado")
+except ImportError:
+    print("  [ERROR] flask-cors no esta instalado.")
+    print("  Ejecute: pip install flask-cors")
+    print("")
+    input("  Presione Enter para cerrar...")
+    sys.exit(1)
+
+try:
+    import qrcode
+    from PIL import Image
+    HAS_QR = True
+    print("  [OK] qrcode + Pillow encontrado")
+except ImportError:
+    HAS_QR = False
+    print("  [WARN] qrcode/Pillow no encontrado - QR no se imprimira")
+    print("         Para QR: pip install qrcode[pil]")
+
+try:
+    import win32print
+    import win32api
+    WINDOWS = True
+    print("  [OK] pywin32 encontrado (modo Windows)")
+except ImportError:
+    WINDOWS = False
+    print("  [WARN] pywin32 no encontrado - modo simulacion")
+    print("         Para imprimir real: pip install pywin32")
+
+print("")
 
 app = Flask(__name__)
 CORS(app)  # Habilitar CORS para todas las rutas
 
 def enviar_a_impresora(nombre_impresora, datos):
+    if not WINDOWS:
+        logging.warning("Simulacion: %d bytes enviados a impresora", len(datos))
+        return True
     try:
         hPrinter = win32print.OpenPrinter(nombre_impresora)
-        hJob = win32print.StartDocPrinter(hPrinter, 1, ("Trabajo de impresión", None, "RAW"))
+        hJob = win32print.StartDocPrinter(hPrinter, 1, ("Trabajo de impresion", None, "RAW"))
         win32print.StartPagePrinter(hPrinter)
         win32print.WritePrinter(hPrinter, datos)
         win32print.EndPagePrinter(hPrinter)
@@ -18,114 +75,129 @@ def enviar_a_impresora(nombre_impresora, datos):
         win32print.ClosePrinter(hPrinter)
         return True
     except Exception as e:
-        print(f"Error al imprimir: {e}")
+        logging.error("Error al imprimir: %s", e)
         return False
+
+
+def generar_qr_bitmap(data_str, pixel_size=8):
+    """Genera un QR code como imagen bitmap y lo convierte a comandos
+    ESC/POS raster (GS v 0) compatibles con todas las impresoras termicas.
+    pixel_size: tamano de cada modulo QR en pixeles (default 8)
+    """
+    if not HAS_QR:
+        logging.warning("qrcode no disponible, no se puede generar QR")
+        return b''
+
+    try:
+        # Generar QR como imagen PIL
+        qr = qrcode.QRCode(
+            version=None,
+            error_correction=qrcode.constants.ERROR_CORRECT_M,
+            box_size=pixel_size,
+            border=2,
+        )
+        qr.add_data(data_str)
+        qr.make(fit=True)
+        img = qr.make_image(fill_color="black", back_color="white").convert('1')
+
+        # Redimensionar si es muy grande (max 384px para 80mm)
+        max_width = 384
+        if img.width > max_width:
+            ratio = max_width / img.width
+            new_h = int(img.height * ratio)
+            img = img.resize((max_width, new_h), Image.NEAREST)
+
+        # Asegurar que el ancho sea multiplo de 8
+        w = img.width
+        if w % 8 != 0:
+            new_w = w + (8 - w % 8)
+            new_img = Image.new('1', (new_w, img.height), 1)  # blanco
+            new_img.paste(img, (0, 0))
+            img = new_img
+
+        width_bytes = img.width // 8
+        height = img.height
+        pixels = img.load()
+
+        # Construir datos raster
+        raster_data = b''
+        for y in range(height):
+            row = b''
+            for x_byte in range(width_bytes):
+                byte_val = 0
+                for bit in range(8):
+                    x = x_byte * 8 + bit
+                    if x < img.width and pixels[x, y] == 0:  # negro
+                        byte_val |= (0x80 >> bit)
+                row += bytes([byte_val])
+            raster_data += row
+
+        # GS v 0 - Print raster bit image
+        # m=0 (normal), xL xH = width_bytes, yL yH = height
+        xL = width_bytes & 0xFF
+        xH = (width_bytes >> 8) & 0xFF
+        yL = height & 0xFF
+        yH = (height >> 8) & 0xFF
+
+        cmd = b'\x1d\x76\x30\x00'  # GS v 0 m
+        cmd += bytes([xL, xH, yL, yH])
+        cmd += raster_data
+
+        logging.info("QR bitmap generado: %dx%d px, %d bytes", img.width, height, len(cmd))
+        return cmd
+
+    except Exception as e:
+        logging.error("Error generando QR bitmap: %s", e)
+        return b''
 
 def generar_ticket(pedido):
     ESC = b'\x1b'
     GS  = b'\x1d'
     NL  = b'\n'
-    WIDTH = 50  # Ancho en caracteres para 80mm
+    WIDTH = 48  # Ancho en caracteres para 80mm (estandar)
 
     def centrar(texto):
         return texto.center(WIDTH)[:WIDTH]
 
-    def izquierda(texto):
-        return ("  " + texto).ljust(WIDTH)[:WIDTH]
+    def separador():
+        return ("-" * WIDTH).encode("cp437") + NL
 
     ticket = b""
     ticket += ESC + b'@'  # Inicializar impresora
+    ticket += b'\x1b\x61\x01'  # Centrar TODO el ticket
     ticket += ESC + b'd\x01'
 
-    # Encabezado
-    ticket += centrar("RINNO && FAVRIC").encode("cp437") + NL
-    ticket += centrar("RUT: 99.999.999-K").encode("cp437") + NL
-    ticket += centrar("Av. IV Centenario 548, Santiago").encode("cp437") + NL
-    ticket += ("-" * WIDTH).encode("cp437") + NL
+    # Encabezado (nombre del cliente/marca)
+    brand_name = pedido.get("brandName", "Casino")
+    ticket += b'\x1b\x45\x01'  # Negrita
+    ticket += b'\x1d\x21\x11'  # Doble alto y ancho
+    ticket += brand_name.upper().encode("cp437") + NL
+    ticket += b'\x1d\x21\x00'  # Tamano normal
+    ticket += b'\x1b\x45\x00'  # Fin negrita
     now = datetime.now().strftime("%Y-%m-%d %H:%M")
     ticket += centrar(f"Fecha: {now}").encode("cp437") + NL
-    ticket += b'\x1b\x45\x01'  # ESC E 1
-    numero_pedido = pedido.get("numeroPedido", "N/A")
-    ticket += centrar(f"Pedido #{numero_pedido}").encode("cp437") + NL
-    ticket += b'\x1b\x45\x00'
-    ticket += ("-" * WIDTH).encode("cp437") + NL
 
-    # Datos del Cliente
-    ticket += NL
-    ticket += b'\x1b\x45\x01'  # Negrita
-    ticket += centrar("DATOS DEL CLIENTE").encode("cp437") + NL
-    ticket += b'\x1b\x45\x00'  # Fin negrita
-    ticket += ("-" * WIDTH).encode("cp437") + NL
-    
-    rut_cliente = pedido.get("rut", "No especificado")
-    ticket += izquierda(f"RUT: {rut_cliente}").encode("cp437") + NL
-    
-    # Nombre puede venir como 'nombre' o 'nombreCliente'
-    nombre_cliente = pedido.get("nombre") or pedido.get("nombreCliente", "No especificado")
-    ticket += izquierda(f"Nombre: {nombre_cliente}").encode("cp437") + NL
-    
-    ticket += NL
-    
-    # Extraer selección desde productos o desde el campo directo
-    seleccion = pedido.get("seleccion", "")
-    para_llevar = pedido.get("paraLlevar", False)
-    
-    # Extraer desde productos si no viene seleccion directa
-    productos = pedido.get("productos", [])
-    if not seleccion and productos:
-        nombre_producto = productos[0].get("nombre", "")
-        nombre_lower = nombre_producto.lower()
-        if "almuerzo" in nombre_lower:
-            seleccion = "almuerzo"
-        elif "desayuno" in nombre_lower:
-            seleccion = "desayuno"
-        elif "cena" in nombre_lower:
-            seleccion = "cena"
-        elif "colacion" in nombre_lower or "colación" in nombre_lower:
-            seleccion = "colacion"
-        else:
-            # Limpiar prefijo "Ticket de " si existe
-            seleccion = nombre_producto.replace("Ticket de ", "").strip()
-        
-        if "llevar" in nombre_lower:
-            para_llevar = True
-    
-    # Selección
-    ticket += b'\x1b\x45\x01'  # Negrita
-    ticket += centrar("SELECCION").encode("cp437") + NL
-    ticket += b'\x1b\x45\x00'  # Fin negrita
-    ticket += ("-" * WIDTH).encode("cp437") + NL
-    
-    if seleccion.lower() == "desayuno":
-        ticket += izquierda("[ X ] Desayuno").encode("cp437") + NL
-        ticket += izquierda("[   ] Almuerzo").encode("cp437") + NL
-        ticket += izquierda("[   ] Cena").encode("cp437") + NL
-    elif seleccion.lower() == "almuerzo":
-        ticket += izquierda("[   ] Desayuno").encode("cp437") + NL
-        ticket += izquierda("[ X ] Almuerzo").encode("cp437") + NL
-        ticket += izquierda("[   ] Cena").encode("cp437") + NL
-    elif seleccion.lower() == "cena":
-        ticket += izquierda("[   ] Desayuno").encode("cp437") + NL
-        ticket += izquierda("[   ] Almuerzo").encode("cp437") + NL
-        ticket += izquierda("[ X ] Cena").encode("cp437") + NL
-    else:
-        ticket += izquierda(f"Tipo: {seleccion}").encode("cp437") + NL
-    
-    ticket += NL
-    
-    # Para llevar
-    ticket += b'\x1b\x45\x01'  # Negrita
-    if para_llevar:
-        ticket += centrar("*** PARA LLEVAR ***").encode("cp437") + NL
-    else:
-        ticket += centrar("*** PARA SERVIR ***").encode("cp437") + NL
-    ticket += b'\x1b\x45\x00'  # Fin negrita
-    
-    ticket += NL
-    ticket += ("-" * WIDTH).encode("cp437") + NL * 2
+    # Evento y nombre de persona
+    evento_nombre = pedido.get("eventoNombre", "")
+    if evento_nombre:
+        ticket += centrar(evento_nombre).encode("cp437") + NL
+    nombre_cliente = pedido.get("nombreCliente", "")
+    if nombre_cliente:
+        ticket += centrar(nombre_cliente).encode("cp437") + NL
 
-    # Footer
-    ticket += centrar("¡Gracias por su preferencia!").encode("cp437") + NL * 3
+    ticket += NL
+
+    # QR Code (si hay ticketNumber)
+    ticket_number = pedido.get("ticketNumber", "")
+    if ticket_number:
+        qr_data = generar_qr_bitmap(ticket_number, pixel_size=10)
+        if qr_data:
+            ticket += qr_data
+            ticket += NL
+        ticket += NL
+        ticket += centrar(f"Ticket: {ticket_number}").encode("cp437") + NL
+
+    ticket += NL
 
     # Avanzar papel y cortar
     ticket += ESC + b'd\x01'
@@ -140,8 +212,15 @@ def imprimir():
         if not data:
             return jsonify({"resultado": "error", "mensaje": "No se recibieron datos"}), 400
         
-        nombre_impresora = data.get("nombreImpresora", win32print.GetDefaultPrinter())
+        if WINDOWS:
+            nombre_impresora = data.get("nombreImpresora", win32print.GetDefaultPrinter())
+        else:
+            nombre_impresora = data.get("nombreImpresora", "SimulatedPrinter")
         contenido = generar_ticket(data)
+        logging.info("Ticket generado: %d bytes, impresora: %s", len(contenido), nombre_impresora)
+        logging.info("Datos recibidos - RUT: %s, Nombre: %s, Pedido: %s, TicketNumber: %s",
+                     data.get('rut', 'N/A'), data.get('nombreCliente', 'N/A'),
+                     data.get('numeroPedido', 'N/A'), data.get('ticketNumber', 'N/A'))
         exito = enviar_a_impresora(nombre_impresora, contenido)
         
         return jsonify({
@@ -158,13 +237,15 @@ def imprimir_casino():
 
 @app.route("/status", methods=["GET"])
 def status():
-    """Endpoint para verificar el estado del servicio de impresión"""
+    """Endpoint para verificar el estado del servicio de impresion"""
     try:
-        # Verificar que podemos acceder a las impresoras
-        impresora_default = win32print.GetDefaultPrinter()
+        if WINDOWS:
+            impresora_default = win32print.GetDefaultPrinter()
+        else:
+            impresora_default = "SimulatedPrinter (no Windows)"
         return jsonify({
             "estado": "ok",
-            "mensaje": "Servicio de impresión activo",
+            "mensaje": "Servicio de impresion activo",
             "impresora_default": impresora_default
         })
     except Exception as e:
@@ -174,4 +255,23 @@ def status():
         }), 500
 
 if __name__ == "__main__":
-    app.run(host="127.0.0.1", port=8000, debug=True)
+    try:
+        print("  Servidor: http://127.0.0.1:8000")
+        print("  Endpoints: /status, /imprimir, /imprimir-casino")
+        if WINDOWS:
+            try:
+                print(f"  Impresora default: {win32print.GetDefaultPrinter()}")
+            except Exception:
+                print("  [WARN] No se detecto impresora por defecto")
+        else:
+            print("  Modo: SIMULACION (no Windows / sin pywin32)")
+        print("")
+        print("  Servidor corriendo... (Ctrl+C para detener)")
+        print("=" * 50)
+        print("")
+        app.run(host="127.0.0.1", port=8000, debug=False)
+    except Exception as e:
+        print("")
+        print(f"  [ERROR FATAL] {e}")
+        print("")
+        input("  Presione Enter para cerrar...")

@@ -25,6 +25,7 @@ export class ComidaSeleccionComponent implements OnInit, OnDestroy {
   servicios: ServicioComida[] = [];
   seleccionado: ServicioComida | null = null;
   imprimiendo: boolean = false;
+  ticketImpreso: boolean = false;
   mostrarPreviewTicket: boolean = false;
   qrDataUrl: string = '';
   mostrarAvisoReimpresion: boolean = false;
@@ -268,6 +269,7 @@ export class ComidaSeleccionComponent implements OnInit, OnDestroy {
 
     // Solo mostrar preview, NO cambiar estado aún
     this.generarQR(this.seleccionado.ticketNumber || '');
+    this.ticketImpreso = false;
     this.mostrarPreviewTicket = true;
   }
 
@@ -306,6 +308,7 @@ export class ComidaSeleccionComponent implements OnInit, OnDestroy {
    * Maneja click en el overlay del preview (cierra si es fuera del modal)
    */
   onOverlayClick(event: MouseEvent): void {
+    if (this.imprimiendo || this.ticketImpreso) return;
     if (
       (event.target as HTMLElement).classList.contains('ticket-preview-overlay')
     ) {
@@ -340,18 +343,19 @@ export class ComidaSeleccionComponent implements OnInit, OnDestroy {
         numeroPedido,
         this.empleado.rut,
         this.empleado.nombre,
+        this.seleccionado.ticketNumber || undefined,
+        this.brandName,
+        this.eventoActual?.name || undefined,
       )
       .subscribe({
         next: (respuesta) => {
           this.imprimiendo = false;
           if (respuesta.resultado === 'ok') {
-            this.mostrarToast('Ticket enviado a la impresora', 'success');
+            this.ticketImpreso = true;
+            this.mostrarToast('Ticket impreso correctamente', 'success');
 
-            // Solo marcar como 'printed' DESPUÉS de que la impresora confirme éxito
-            if (
-              this.seleccionado?.ticketId &&
-              this.seleccionado.ticketStatus === 'pending'
-            ) {
+            // Marcar como 'printed' DESPUÉS de que la impresora confirme éxito
+            if (this.seleccionado?.ticketId) {
               this.casinoService
                 .updateTicketStatus(this.seleccionado.ticketId, 'printed')
                 .subscribe({
@@ -359,11 +363,24 @@ export class ComidaSeleccionComponent implements OnInit, OnDestroy {
                     console.log('✅ Estado del ticket actualizado a printed');
                     if (this.seleccionado) {
                       this.seleccionado.ticketStatus = 'printed';
+                      // Actualizar también en la lista local
+                      const svc = this.servicios.find(
+                        (s) => s.id === this.seleccionado?.id,
+                      );
+                      if (svc) svc.ticketStatus = 'printed';
                     }
+                    // Auto-cerrar y volver al inicio tras 2s
+                    setTimeout(() => this.cerrarPreview(), 2000);
                   },
-                  error: (err) =>
-                    console.warn('⚠️ No se pudo actualizar estado:', err),
+                  error: (err) => {
+                    console.warn('⚠️ No se pudo actualizar estado:', err);
+                    // Aun así cerrar tras 3s
+                    setTimeout(() => this.cerrarPreview(), 3000);
+                  },
                 });
+            } else {
+              // Sin ticketId, cerrar tras 2s
+              setTimeout(() => this.cerrarPreview(), 2000);
             }
           } else {
             this.mostrarToast(

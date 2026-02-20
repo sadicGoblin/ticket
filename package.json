@@ -51,8 +51,8 @@
     "wait-on": "^8.0.3"
   },
   "build": {
-    "appId": "com.angular-base.app",
-    "productName": "Angular Base Project",
+    "appId": "com.rinno.totem-casino",
+    "productName": "Totem Casino",
     "directories": {
       "output": "dist-electron"
     },
@@ -62,16 +62,44 @@
       "preload.js",
       "package.json"
     ],
+    "extraResources": [
+      {
+        "from": "plugin_impresion.py",
+        "to": "plugin_impresion.py"
+      },
+      {
+        "from": "requirements.txt",
+        "to": "requirements.txt"
+      },
+      {
+        "from": "plugin_watchdog.bat",
+        "to": "plugin_watchdog.bat"
+      },
+      {
+        "from": "iniciar_totem.bat",
+        "to": "iniciar_totem.bat"
+      },
+      {
+        "from": "setup_totem.bat",
+        "to": "setup_totem.bat"
+      }
+    ],
     "win": {
       "target": [
         "portable",
         "nsis"
-      ],
-      "icon": "src/favicon.ico"
+      ]
     },
     "nsis": {
       "oneClick": false,
-      "allowToChangeInstallationDirectory": true
+      "allowToChangeInstallationDirectory": true,
+      "allowElevation": true,
+      "perMachine": true,
+      "deleteAppDataOnUninstall": true,
+      "uninstallDisplayName": "Totem Casino",
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "Totem Casino"
     }
   }
 }

@@ -28,7 +28,7 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-    height: 80px;
+    height: 100px;
   }
 }
 
@@ -38,14 +38,14 @@
   gap: 16px;
 
   .brand-logo {
-    height: 44px;
+    height: 56px;
     width: auto;
     object-fit: contain;
   }
 
   .brand-text {
     color: var(--wm-white);
-    font-size: 2rem;
+    font-size: 2.4rem;
     font-weight: 700;
     letter-spacing: -0.02em;
   }
@@ -55,22 +55,23 @@
 .btn-back {
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 10px;
   background: rgba(255, 255, 255, 0.15);
   border: none;
-  border-radius: 8px;
+  border-radius: 12px;
   color: var(--wm-white);
-  padding: 10px 20px;
-  font-size: 1rem;
-  font-weight: 500;
+  padding: 16px 28px;
+  font-size: 1.4rem;
+  font-weight: 600;
   cursor: pointer;
   transition: all 0.2s ease;
   font-family: "Inter", sans-serif;
-  min-width: 110px;
+  min-width: 130px;
+  -webkit-tap-highlight-color: transparent;
 
   svg {
-    width: 20px;
-    height: 20px;
+    width: 28px;
+    height: 28px;
   }
 
   &:hover {
@@ -81,8 +82,8 @@
 /* Vista principal */
 .main-view {
   width: 100%;
-  max-width: 640px;
-  padding: 48px 32px 140px;
+  max-width: 800px;
+  padding: 48px 40px 60px;
   animation: fadeInUp 0.4s ease;
 }
 
@@ -90,14 +91,14 @@
 .flow-badge {
   display: inline-flex;
   align-items: center;
-  gap: 8px;
+  gap: 10px;
   background: rgba(var(--wm-blue-rgb), 0.08);
   color: var(--wm-blue);
-  padding: 8px 20px;
+  padding: 12px 28px;
   border-radius: 24px;
-  font-size: 1rem;
+  font-size: 1.3rem;
   font-weight: 600;
-  margin-bottom: 16px;
+  margin-bottom: 20px;
   letter-spacing: 0.02em;
 
   .flow-badge-icon {
@@ -105,8 +106,8 @@
     align-items: center;
 
     svg {
-      width: 20px;
-      height: 20px;
+      width: 24px;
+      height: 24px;
     }
   }
 }
@@ -114,18 +115,18 @@
 /* Header */
 .header {
   text-align: center;
-  margin-bottom: 28px;
+  margin-bottom: 36px;
 
   h1 {
-    font-size: 2.5rem;
-    margin: 0 0 8px;
+    font-size: 3.2rem;
+    margin: 0 0 12px;
     font-weight: 700;
     color: var(--wm-gray-900);
     letter-spacing: -0.02em;
   }
 
   .subtitle {
-    font-size: 1.2rem;
+    font-size: 1.5rem;
     color: var(--wm-gray-500);
     font-weight: 400;
     margin: 0;
@@ -135,40 +136,40 @@
 /* Card */
 .card {
   background: var(--wm-white);
-  border-radius: 16px;
-  padding: 36px;
+  border-radius: 20px;
+  padding: 40px;
   box-shadow:
     0 1px 3px rgba(0, 0, 0, 0.06),
     0 4px 16px rgba(0, 0, 0, 0.06);
-  margin-bottom: 20px;
+  margin-bottom: 24px;
 }
 
 /* Display del RUT */
 .rut-display-container {
-  margin-bottom: 24px;
+  margin-bottom: 28px;
 
   .rut-label {
     display: block;
-    font-size: 1rem;
+    font-size: 1.3rem;
     font-weight: 600;
     color: var(--wm-gray-500);
     text-transform: uppercase;
     letter-spacing: 0.08em;
-    margin-bottom: 10px;
+    margin-bottom: 12px;
   }
 }
 
 .rut-display {
   background: var(--wm-gray-50);
   border: 2px solid var(--wm-gray-200);
-  padding: 20px 24px;
-  border-radius: 14px;
-  font-size: clamp(1.6rem, 4vw, 2.4rem);
+  padding: 28px 24px;
+  border-radius: 16px;
+  font-size: 2.8rem;
   font-weight: 600;
   color: var(--wm-gray-900);
-  letter-spacing: 4px;
+  letter-spacing: 6px;
   font-family: "Inter", monospace;
-  min-height: 72px;
+  min-height: 90px;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -191,21 +192,22 @@
 .numpad-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 14px;
+  gap: 16px;
 }
 
 .numpad-btn {
   background: var(--wm-gray-50);
   border: 1.5px solid var(--wm-gray-200);
-  border-radius: 14px;
-  padding: 28px;
-  font-size: 2.2rem;
+  border-radius: 16px;
+  padding: 36px;
+  font-size: 2.8rem;
   font-weight: 600;
   color: var(--wm-gray-900);
   cursor: pointer;
   transition: all 0.15s ease;
   user-select: none;
   font-family: "Inter", sans-serif;
+  -webkit-tap-highlight-color: transparent;
 
   &:hover:not(:disabled) {
     background: var(--wm-blue);
@@ -238,8 +240,8 @@
     color: var(--wm-error);
 
     svg {
-      width: 32px;
-      height: 32px;
+      width: 40px;
+      height: 40px;
     }
 
     &:hover:not(:disabled) {
@@ -293,18 +295,12 @@
   }
 }
 
-/* Contenedor de acción */
+/* Contenedor de acción — ahora inline debajo del teclado */
 .action-container {
-  position: fixed;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  background: var(--wm-white);
-  padding: 24px 32px;
-  padding-bottom: max(24px, env(safe-area-inset-bottom));
-  box-shadow:
-    0 -1px 0 var(--wm-gray-200),
-    0 -8px 24px rgba(0, 0, 0, 0.06);
+  position: static;
+  background: transparent;
+  padding: 24px 0 0;
+  box-shadow: none;
   z-index: 50;
   display: flex;
   justify-content: center;
@@ -312,16 +308,15 @@
 
 .btn-siguiente {
   width: 100%;
-  max-width: 640px;
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 12px;
-  padding: 22px;
-  font-size: 1.4rem;
+  padding: 28px;
+  font-size: 1.8rem;
   font-weight: 700;
   border: none;
-  border-radius: 12px;
+  border-radius: 16px;
   background: var(--wm-blue);
   color: var(--wm-white);
   cursor: pointer;
@@ -329,6 +324,7 @@
   text-transform: uppercase;
   letter-spacing: 0.5px;
   font-family: "Inter", sans-serif;
+  -webkit-tap-highlight-color: transparent;
 
   &:hover:not(:disabled) {
     background: var(--wm-blue-dark);
@@ -530,6 +526,18 @@
   }
 
   &.warning {
+    .print-icon {
+      width: 64px;
+      height: 64px;
+      margin: 0 auto 12px;
+      color: var(--wm-warning, #f57c00);
+
+      svg {
+        width: 64px;
+        height: 64px;
+      }
+    }
+
     .print-message {
       font-size: 1.1rem;
       font-weight: 700;
@@ -737,101 +745,39 @@
   }
 }
 
-/* Responsive */
-@media (max-width: 768px) {
-  .top-bar {
-    padding: 0 16px;
-  }
-
+/* Kiosk portrait 1080x1920 */
+@media (min-height: 1200px) {
   .main-view {
-    padding: 24px 16px 110px;
+    max-width: 85%;
+    padding: 60px 40px 60px;
   }
 
   .header h1 {
+    font-size: 3.8rem;
+  }
+
+  .header .subtitle {
     font-size: 1.8rem;
   }
 
   .card {
-    padding: 24px 20px;
+    padding: 48px;
   }
 
   .rut-display {
-    letter-spacing: 2px;
-    min-height: 58px;
+    font-size: 3.2rem;
+    min-height: 100px;
+    padding: 32px;
+    letter-spacing: 8px;
   }
 
   .numpad-btn {
-    padding: 20px;
-    font-size: 1.6rem;
-  }
-
-  .result-view {
-    padding: 20px 16px 110px;
-  }
-
-  .success-card {
-    padding: 24px 20px;
-  }
-
-  .info-item {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 4px;
-
-    .info-value {
-      text-align: left;
-    }
-  }
-
-  .action-container {
-    padding: 16px;
+    padding: 44px;
+    font-size: 3.2rem;
   }
 
   .btn-siguiente {
-    font-size: 1.1rem;
-    padding: 16px;
-  }
-
-  .btn-back {
-    padding: 8px 14px;
-    font-size: 0.9rem;
-    min-width: auto;
-  }
-}
-
-@media (max-width: 480px) {
-  .top-bar .top-bar-inner {
-    height: 56px;
-  }
-
-  .brand .brand-text {
-    font-size: 1.3rem;
-  }
-
-  .brand .brand-logo {
-    height: 28px;
-  }
-
-  .header h1 {
-    font-size: 1.5rem;
-  }
-
-  .rut-display {
-    letter-spacing: 1.5px;
-  }
-
-  .numpad-btn {
-    padding: 16px;
-    font-size: 1.4rem;
-  }
-
-  .btn-back {
-    padding: 6px 10px;
-    font-size: 0.8rem;
-
-    svg {
-      width: 16px;
-      height: 16px;
-    }
+    padding: 32px;
+    font-size: 2.2rem;
   }
 }
