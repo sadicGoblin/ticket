@@ -208,6 +208,12 @@
     box-shadow: 0 0 0 3px rgba(var(--wm-blue-rgb), 0.15);
   }
 
+  &.disabled {
+    background: var(--wm-gray-50);
+    cursor: default;
+    opacity: 0.7;
+  }
+
   &.code-input {
     font-family: "Courier New", monospace;
     letter-spacing: 0.2em;

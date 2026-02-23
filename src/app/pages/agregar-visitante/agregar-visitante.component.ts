@@ -43,6 +43,7 @@ export class AgregarVisitanteComponent implements OnInit, OnDestroy {
   loading: boolean = false;
   errorMessage: string = '';
   personExists: boolean = false;
+  rutVerified: boolean = false;
   personData: CheckRutResponse['person'] | null = null;
   visitorsAdded: number = 0;
 
@@ -89,7 +90,9 @@ export class AgregarVisitanteComponent implements OnInit, OnDestroy {
       next: (response) => {
         this.loadingEvents = false;
         // Solo eventos con código de supervisor
-        this.eventsToday = response.events.filter(e => e.supervisor_code !== null);
+        this.eventsToday = response.events.filter(
+          (e) => e.supervisor_code !== null,
+        );
       },
       error: (error) => {
         this.loadingEvents = false;
@@ -125,12 +128,12 @@ export class AgregarVisitanteComponent implements OnInit, OnDestroy {
 
     this.countdownInterval = setInterval(() => {
       this.tiempoRestante--;
-      
+
       // Mostrar popup cuando quedan 30 segundos
       if (this.tiempoRestante === 30) {
         this.showTimeoutPopup = true;
       }
-      
+
       if (this.tiempoRestante <= 0) {
         this.clearInactivityTimer();
         this.cerrarSesion();
@@ -188,7 +191,8 @@ export class AgregarVisitanteComponent implements OnInit, OnDestroy {
 
     switch (this.activeField) {
       case 'supervisorCode':
-        if (this.supervisorCode.length < 30) this.supervisorCode += key.toUpperCase();
+        if (this.supervisorCode.length < 30)
+          this.supervisorCode += key.toUpperCase();
         break;
       case 'rut':
         if (this.documentNumber.length < 12) {
@@ -218,6 +222,7 @@ export class AgregarVisitanteComponent implements OnInit, OnDestroy {
       case 'rut':
         this.documentNumber = this.documentNumber.slice(0, -1);
         this.personExists = false;
+        this.rutVerified = false;
         this.personData = null;
         break;
       case 'firstName':
@@ -241,6 +246,7 @@ export class AgregarVisitanteComponent implements OnInit, OnDestroy {
       case 'rut':
         this.documentNumber = '';
         this.personExists = false;
+        this.rutVerified = false;
         this.personData = null;
         this.firstName = '';
         this.lastName = '';
@@ -273,38 +279,42 @@ export class AgregarVisitanteComponent implements OnInit, OnDestroy {
     this.loading = true;
     this.errorMessage = '';
 
-    this.visitorService.validateSupervisorCode({
-      event_code: this.selectedEvent.code,
-      supervisor_code: this.supervisorCode,
-    }).subscribe({
-      next: (response) => {
-        this.loading = false;
-        
-        if (response.success && response.event) {
-          this.validatedEvent = response.event;
-          this.currentStep = 'registro';
-          this.activeField = 'rut';
-          this.visitorsAdded = 0;
-          // Iniciar timer solo después de validar
-          this.resetInactivityTimer();
-        } else {
-          this.errorMessage = response.error || 'Código de supervisor no encontrado';
-        }
-      },
-      error: (error) => {
-        this.loading = false;
-        
-        if (error.status === 403) {
-          this.errorMessage = 'Código de supervisor incorrecto';
-        } else if (error.status === 404) {
-          this.errorMessage = 'Evento no encontrado';
-        } else {
-          this.errorMessage = error.error?.error || 'Código de supervisor no encontrado';
-        }
-        
-        console.error('Error al validar código:', error);
-      },
-    });
+    this.visitorService
+      .validateSupervisorCode({
+        event_code: this.selectedEvent.code,
+        supervisor_code: this.supervisorCode,
+      })
+      .subscribe({
+        next: (response) => {
+          this.loading = false;
+
+          if (response.success && response.event) {
+            this.validatedEvent = response.event;
+            this.currentStep = 'registro';
+            this.activeField = 'rut';
+            this.visitorsAdded = 0;
+            // Iniciar timer solo después de validar
+            this.resetInactivityTimer();
+          } else {
+            this.errorMessage =
+              response.error || 'Código de supervisor no encontrado';
+          }
+        },
+        error: (error) => {
+          this.loading = false;
+
+          if (error.status === 403) {
+            this.errorMessage = 'Código de supervisor incorrecto';
+          } else if (error.status === 404) {
+            this.errorMessage = 'Evento no encontrado';
+          } else {
+            this.errorMessage =
+              error.error?.error || 'Código de supervisor no encontrado';
+          }
+
+          console.error('Error al validar código:', error);
+        },
+      });
   }
 
   // ── Paso 2: Registro de visitantes ──
@@ -332,7 +342,8 @@ export class AgregarVisitanteComponent implements OnInit, OnDestroy {
     this.visitorService.checkRut(rutLimpio).subscribe({
       next: (response) => {
         this.loading = false;
-        
+        this.rutVerified = true;
+
         if (response.exists && response.person) {
           this.personExists = true;
           this.personData = response.person;
@@ -341,8 +352,6 @@ export class AgregarVisitanteComponent implements OnInit, OnDestroy {
         } else {
           this.personExists = false;
           this.personData = null;
-          this.firstName = '';
-          this.lastName = '';
           this.activeField = 'firstName';
         }
       },
@@ -360,7 +369,10 @@ export class AgregarVisitanteComponent implements OnInit, OnDestroy {
       return;
     }
 
-    if (!this.personExists && (!this.firstName.trim() || !this.lastName.trim())) {
+    if (
+      !this.personExists &&
+      (!this.firstName.trim() || !this.lastName.trim())
+    ) {
       this.errorMessage = 'Ingrese nombre y apellido del visitante';
       return;
     }
@@ -369,40 +381,44 @@ export class AgregarVisitanteComponent implements OnInit, OnDestroy {
     this.loading = true;
     this.errorMessage = '';
 
-    this.visitorService.addVisitor({
-      supervisor_code: this.supervisorCode,
-      supervisor_name: 'Supervisor',
-      event_code: this.validatedEvent.code,
-      document_number: this.documentNumber,
-      first_name: this.firstName,
-      last_name: this.lastName,
-    }).subscribe({
-      next: (response) => {
-        this.loading = false;
-        
-        if (response.success) {
-          this.addedVisitor = response;
-          this.visitorsAdded++;
-          this.currentStep = 'confirmacion';
-        } else {
-          this.errorMessage = response.error || 'Error al agregar visitante';
-        }
-      },
-      error: (error) => {
-        this.loading = false;
-        
-        if (error.status === 403) {
-          this.errorMessage = 'Sesión expirada. Vuelva a iniciar.';
-          setTimeout(() => this.cerrarSesion(), 2000);
-        } else if (error.status === 400) {
-          this.errorMessage = error.error?.error || 'Esta persona ya está registrada en el evento';
-        } else {
-          this.errorMessage = 'Error al conectar con el servidor';
-        }
-        
-        console.error('Error al agregar visitante:', error);
-      },
-    });
+    this.visitorService
+      .addVisitor({
+        supervisor_code: this.supervisorCode,
+        supervisor_name: 'Supervisor',
+        event_code: this.validatedEvent.code,
+        document_number: this.documentNumber,
+        first_name: this.firstName,
+        last_name: this.lastName,
+      })
+      .subscribe({
+        next: (response) => {
+          this.loading = false;
+
+          if (response.success) {
+            this.addedVisitor = response;
+            this.visitorsAdded++;
+            this.currentStep = 'confirmacion';
+          } else {
+            this.errorMessage = response.error || 'Error al agregar visitante';
+          }
+        },
+        error: (error) => {
+          this.loading = false;
+
+          if (error.status === 403) {
+            this.errorMessage = 'Sesión expirada. Vuelva a iniciar.';
+            setTimeout(() => this.cerrarSesion(), 2000);
+          } else if (error.status === 400) {
+            this.errorMessage =
+              error.error?.error ||
+              'Esta persona ya está registrada en el evento';
+          } else {
+            this.errorMessage = 'Error al conectar con el servidor';
+          }
+
+          console.error('Error al agregar visitante:', error);
+        },
+      });
   }
 
   // ── Paso 3: Confirmación ──
@@ -414,6 +430,7 @@ export class AgregarVisitanteComponent implements OnInit, OnDestroy {
     this.firstName = '';
     this.lastName = '';
     this.personExists = false;
+    this.rutVerified = false;
     this.personData = null;
     this.addedVisitor = null;
     this.activeField = 'rut';
@@ -430,6 +447,7 @@ export class AgregarVisitanteComponent implements OnInit, OnDestroy {
     this.firstName = '';
     this.lastName = '';
     this.personExists = false;
+    this.rutVerified = false;
     this.personData = null;
     this.addedVisitor = null;
     this.errorMessage = '';
@@ -454,8 +472,7 @@ export class AgregarVisitanteComponent implements OnInit, OnDestroy {
   }
 
   get canValidate(): boolean {
-    return this.selectedEvent !== null && 
-           this.supervisorCode.trim().length > 0;
+    return this.selectedEvent !== null && this.supervisorCode.trim().length > 0;
   }
 
   get maskedCode(): string {
@@ -464,7 +481,7 @@ export class AgregarVisitanteComponent implements OnInit, OnDestroy {
 
   get canAddVisitor(): boolean {
     if (!this.documentNumber || this.documentNumber.length < 8) return false;
-    if (!this.personExists && (!this.firstName.trim() || !this.lastName.trim())) return false;
+    if (!this.firstName.trim() || !this.lastName.trim()) return false;
     return true;
   }
 }

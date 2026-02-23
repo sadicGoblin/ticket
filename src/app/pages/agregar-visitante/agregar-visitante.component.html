@@ -282,12 +282,7 @@
       <!-- Mensaje cuando persona no existe y se verificó -->
       <div
         class="rut-not-found"
-        *ngIf="
-          !personExists &&
-          !loading &&
-          documentNumber.length >= 8 &&
-          activeField !== 'rut'
-        "
+        *ngIf="rutVerified && !personExists && !loading"
       >
         <svg viewBox="0 0 24 24" fill="none">
           <path
@@ -300,34 +295,34 @@
         <span>Persona no encontrada. Ingrese los datos manualmente.</span>
       </div>
 
-      <!-- Campos de nombre (solo si no existe la persona) -->
-      @if (!personExists && documentNumber.length >= 8) {
-        <div class="form-group">
-          <label class="form-label">Nombres</label>
-          <div
-            class="input-display"
-            [class.active]="activeField === 'firstName'"
-            (click)="setActiveField('firstName')"
-          >
-            <span class="input-value" [class.placeholder]="!firstName">
-              {{ firstName || "Ingrese nombres" }}
-            </span>
-          </div>
+      <!-- Campos de nombre (siempre visibles, se auto-rellenan al verificar RUT) -->
+      <div class="form-group">
+        <label class="form-label">Nombres</label>
+        <div
+          class="input-display"
+          [class.active]="activeField === 'firstName'"
+          [class.disabled]="personExists"
+          (click)="!personExists && setActiveField('firstName')"
+        >
+          <span class="input-value" [class.placeholder]="!firstName">
+            {{ firstName || "Ingrese nombres" }}
+          </span>
         </div>
+      </div>
 
-        <div class="form-group">
-          <label class="form-label">Apellidos</label>
-          <div
-            class="input-display"
-            [class.active]="activeField === 'lastName'"
-            (click)="setActiveField('lastName')"
-          >
-            <span class="input-value" [class.placeholder]="!lastName">
-              {{ lastName || "Ingrese apellidos" }}
-            </span>
-          </div>
+      <div class="form-group">
+        <label class="form-label">Apellidos</label>
+        <div
+          class="input-display"
+          [class.active]="activeField === 'lastName'"
+          [class.disabled]="personExists"
+          (click)="!personExists && setActiveField('lastName')"
+        >
+          <span class="input-value" [class.placeholder]="!lastName">
+            {{ lastName || "Ingrese apellidos" }}
+          </span>
         </div>
-      }
+      </div>
 
       <!-- Teclado alfanumérico completo -->
       <div class="keyboard full">

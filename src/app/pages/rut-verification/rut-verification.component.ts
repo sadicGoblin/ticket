@@ -343,14 +343,20 @@ export class RutVerificationComponent implements OnDestroy {
         next: (verification: CheckInVerification) => {
           console.log('✅ Verificación check-in:', verification);
 
-          if (verification.has_check_in) {
-            // Ya tiene check-in, puede continuar
-            console.log(
-              '✅ Usuario ya tiene check-in, continuando a selección',
-            );
+          if (verification.has_check_in || verification.can_redeem_tickets) {
+            // Ya tiene check-in O el backend dice que puede canjear (modo automático)
+            if (verification.has_check_in) {
+              console.log(
+                '✅ Usuario ya tiene check-in, continuando a selección',
+              );
+            } else {
+              console.log(
+                '🔓 Backend permite canjear tickets (modo automático), continuando a selección',
+              );
+            }
             this.router.navigate(['/comida-seleccion']);
           } else {
-            // No tiene check-in
+            // No tiene check-in y no puede canjear
             if (evento.check_in_required === false) {
               // Modo permisivo: hacer check-in automático
               console.log('🔓 Modo permisivo: realizando check-in automático');
