@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { ConfigService } from '../../services/config.service';
@@ -11,9 +11,14 @@ import { PrinterStatusComponent } from '../../components/printer-status/printer-
   templateUrl: './home.component.html',
   styleUrl: './home.component.scss',
 })
-export class HomeComponent {
+export class HomeComponent implements OnInit, OnDestroy {
   config = this.configService.currentConfig;
   logoUrl = this.configService.orgLogoUrl;
+
+  // Estado de conexión a internet
+  isOnline: boolean = navigator.onLine;
+  private onlineHandler = () => this.updateOnlineStatus(true);
+  private offlineHandler = () => this.updateOnlineStatus(false);
 
   // Admin panel
   private tapCount = 0;
@@ -34,6 +39,20 @@ export class HomeComponent {
     sessionStorage.removeItem('flujoActual');
     sessionStorage.removeItem('empleadoActual');
     sessionStorage.removeItem('tipoServicio');
+  }
+
+  ngOnInit(): void {
+    window.addEventListener('online', this.onlineHandler);
+    window.addEventListener('offline', this.offlineHandler);
+  }
+
+  ngOnDestroy(): void {
+    window.removeEventListener('online', this.onlineHandler);
+    window.removeEventListener('offline', this.offlineHandler);
+  }
+
+  private updateOnlineStatus(online: boolean): void {
+    this.isOnline = online;
   }
 
   seleccionarFlujo(flujo: 'ticket' | 'asistencia' | 'visitante'): void {

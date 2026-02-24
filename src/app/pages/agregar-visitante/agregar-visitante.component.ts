@@ -195,8 +195,10 @@ export class AgregarVisitanteComponent implements OnInit, OnDestroy {
           this.supervisorCode += key.toUpperCase();
         break;
       case 'rut':
-        if (this.documentNumber.length < 12) {
-          this.documentNumber += key.toUpperCase();
+        // Extraer solo dígitos y K para validar longitud real
+        const rutLimpio = this.documentNumber.replace(/[^0-9kK]/g, '');
+        if (rutLimpio.length < 9) {
+          this.documentNumber = rutLimpio + key.toUpperCase();
           this.formatearRut();
         }
         break;
@@ -220,7 +222,13 @@ export class AgregarVisitanteComponent implements OnInit, OnDestroy {
         this.supervisorCode = this.supervisorCode.slice(0, -1);
         break;
       case 'rut':
-        this.documentNumber = this.documentNumber.slice(0, -1);
+        // Limpiar formato, quitar último carácter, y reformatear
+        let rutSinFormato = this.documentNumber.replace(/[^0-9kK]/g, '');
+        rutSinFormato = rutSinFormato.slice(0, -1);
+        this.documentNumber = rutSinFormato;
+        if (rutSinFormato.length > 0) {
+          this.formatearRut();
+        }
         this.personExists = false;
         this.rutVerified = false;
         this.personData = null;
@@ -321,11 +329,24 @@ export class AgregarVisitanteComponent implements OnInit, OnDestroy {
 
   formatearRut(): void {
     let rut = this.documentNumber.replace(/[^0-9kK]/g, '');
-    if (rut.length > 1) {
-      const dv = rut.slice(-1).toUpperCase();
-      const cuerpo = rut.slice(0, -1);
-      this.documentNumber = cuerpo + '-' + dv;
+    
+    // Limitar a 9 caracteres (8 números + 1 DV)
+    if (rut.length > 9) {
+      rut = rut.slice(0, 9);
     }
+    
+    if (rut.length < 2) {
+      this.documentNumber = rut;
+      return;
+    }
+    
+    const dv = rut.slice(-1).toUpperCase();
+    const numero = rut.slice(0, -1);
+    
+    // Formatear con puntos de miles
+    const numeroFormateado = numero.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+    
+    this.documentNumber = `${numeroFormateado}-${dv}`;
   }
 
   verificarRut(): void {

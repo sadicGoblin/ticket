@@ -40,6 +40,12 @@ export class ComidaSeleccionComponent implements OnInit, OnDestroy {
   private countdownInterval: any = null;
   private readonly INACTIVITY_TIME = 60000; // 60 segundos
 
+  // Estado de impresión (overlay de bloqueo)
+  estadoImpresion: 'idle' | 'printing' | 'success' | 'error' = 'idle';
+  printingCountdown: number = 5;
+  printingErrorMessage: string = '';
+  private printingCountdownInterval: any = null;
+
   // Inactivity warning modal
   mostrarAvisoInactividad: boolean = false;
   inactividadCountdown: number = 15;
@@ -322,8 +328,9 @@ export class ComidaSeleccionComponent implements OnInit, OnDestroy {
   imprimirDesdePreview(): void {
     if (!this.seleccionado || !this.empleado) return;
 
-    this.resetInactivityTimer();
+    this.clearInactivityTimer();
     this.imprimiendo = true;
+    this.estadoImpresion = 'printing';
 
     const productos = [
       {
@@ -354,44 +361,39 @@ export class ComidaSeleccionComponent implements OnInit, OnDestroy {
             this.ticketImpreso = true;
             this.mostrarToast('Ticket impreso correctamente', 'success');
 
-            // Marcar como 'printed' DESPUÉS de que la impresora confirme éxito
-            if (this.seleccionado?.ticketId) {
+            // Marcar como 'printed' en el servidor usando usageId
+            if (this.seleccionado?.usageId) {
               this.casinoService
-                .updateTicketStatus(this.seleccionado.ticketId, 'printed')
+                .updateTicketStatus(this.seleccionado.usageId, 'printed')
                 .subscribe({
                   next: () => {
                     console.log('✅ Estado del ticket actualizado a printed');
                     if (this.seleccionado) {
                       this.seleccionado.ticketStatus = 'printed';
-                      // Actualizar también en la lista local
                       const svc = this.servicios.find(
                         (s) => s.id === this.seleccionado?.id,
                       );
                       if (svc) svc.ticketStatus = 'printed';
                     }
-                    // Auto-cerrar y volver al inicio tras 2s
-                    setTimeout(() => this.cerrarPreview(), 2000);
+                    this.mostrarExitoImpresion();
                   },
                   error: (err) => {
                     console.warn('⚠️ No se pudo actualizar estado:', err);
-                    // Aun así cerrar tras 3s
-                    setTimeout(() => this.cerrarPreview(), 3000);
+                    // Aún así mostrar éxito ya que la impresión física sí funcionó
+                    this.mostrarExitoImpresion();
                   },
                 });
             } else {
-              // Sin ticketId, cerrar tras 2s
-              setTimeout(() => this.cerrarPreview(), 2000);
+              this.mostrarExitoImpresion();
             }
           } else {
-            this.mostrarToast(
-              'Error al imprimir. Intente nuevamente.',
-              'error',
-            );
+            this.imprimiendo = false;
+            this.mostrarErrorImpresion('Error al imprimir. Intente nuevamente.');
           }
         },
         error: () => {
           this.imprimiendo = false;
-          this.mostrarToast('No se pudo conectar con la impresora.', 'error');
+          this.mostrarErrorImpresion('No se pudo conectar con la impresora.');
         },
       });
   }
@@ -402,6 +404,49 @@ export class ComidaSeleccionComponent implements OnInit, OnDestroy {
   cerrarPreview(): void {
     this.mostrarPreviewTicket = false;
     this.volverAlInicio();
+  }
+
+  /**
+   * Muestra el overlay de éxito después de imprimir
+   */
+  mostrarExitoImpresion(): void {
+    this.estadoImpresion = 'success';
+    this.printingCountdown = 5;
+    
+    // Countdown para cerrar sesión
+    this.printingCountdownInterval = setInterval(() => {
+      this.printingCountdown--;
+      if (this.printingCountdown <= 0) {
+        this.clearPrintingCountdown();
+        this.volverAlInicio();
+      }
+    }, 1000);
+  }
+
+  /**
+   * Muestra error en el overlay de impresión
+   */
+  mostrarErrorImpresion(mensaje: string): void {
+    this.estadoImpresion = 'error';
+    this.printingErrorMessage = mensaje;
+  }
+
+  /**
+   * Cierra el overlay de impresión (para reintentar)
+   */
+  cerrarOverlayImpresion(): void {
+    this.estadoImpresion = 'idle';
+    this.clearPrintingCountdown();
+  }
+
+  /**
+   * Limpia el interval del countdown de impresión
+   */
+  private clearPrintingCountdown(): void {
+    if (this.printingCountdownInterval) {
+      clearInterval(this.printingCountdownInterval);
+      this.printingCountdownInterval = null;
+    }
   }
 
   /**
@@ -417,6 +462,8 @@ export class ComidaSeleccionComponent implements OnInit, OnDestroy {
    */
   volverAlInicio(): void {
     this.clearInactivityTimer();
+    this.clearPrintingCountdown();
+    this.estadoImpresion = 'idle';
     sessionStorage.removeItem('empleadoActual');
     sessionStorage.removeItem('eventoActual');
     sessionStorage.removeItem('flujoActual');

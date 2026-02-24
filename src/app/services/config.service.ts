@@ -128,7 +128,7 @@ const DEFAULT_CONFIG: ClientConfig = {
     name: 'Rinno',
     subtitle: 'Sistema de Casino',
     logo_url: null,
-    welcome_message: 'Bienvenida',
+    welcome_message: 'Bienvenidos',
     welcome_description: 'Seleccione una opción para continuar',
   },
   colors: {

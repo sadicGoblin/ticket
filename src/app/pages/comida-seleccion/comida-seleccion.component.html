@@ -369,6 +369,35 @@
     </div>
   </div>
 
+  <!-- Overlay de impresión (bloquea toda la pantalla) -->
+  <div class="printing-overlay" *ngIf="estadoImpresion !== 'idle'">
+    <div class="printing-modal">
+      @if (estadoImpresion === 'printing') {
+        <div class="printing-spinner"></div>
+        <h2 class="printing-title">Imprimiendo...</h2>
+        <p class="printing-desc">Por favor espere mientras se imprime su ticket</p>
+      } @else if (estadoImpresion === 'success') {
+        <div class="printing-success-icon">
+          <svg viewBox="0 0 24 24" fill="none">
+            <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z" fill="currentColor"/>
+          </svg>
+        </div>
+        <h2 class="printing-title success">¡Ticket Impreso!</h2>
+        <p class="printing-desc">Retire su ticket de la impresora</p>
+        <p class="printing-countdown">Cerrando sesión en {{ printingCountdown }}s...</p>
+      } @else if (estadoImpresion === 'error') {
+        <div class="printing-error-icon">
+          <svg viewBox="0 0 24 24" fill="none">
+            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z" fill="currentColor"/>
+          </svg>
+        </div>
+        <h2 class="printing-title error">Error de Impresión</h2>
+        <p class="printing-desc">{{ printingErrorMessage }}</p>
+        <button class="btn-retry" (click)="cerrarOverlayImpresion()">Intentar de nuevo</button>
+      }
+    </div>
+  </div>
+
   <!-- Modal de inactividad -->
   <div class="inactivity-overlay" *ngIf="mostrarAvisoInactividad">
     <div class="inactivity-modal">

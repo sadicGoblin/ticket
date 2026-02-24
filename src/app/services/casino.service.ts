@@ -38,14 +38,57 @@ export interface ApiService {
 export interface ApiTicketUsage {
   id: number;
   usage_date: string; // "YYYY-MM-DD"
-  status: 'pending' | 'redeemed' | 'skipped' | 'expired';
+  status: 'pending' | 'printed' | 'redeemed' | 'skipped' | 'expired';
   redeemed_at: string | null;
   redeemed_by: number | null;
   redeemed_by_username: string | null;
   redeemed_by_full_name: string | null;
+  printed_at?: string | null;
+  printed_by?: string | null;
   notes: string | null;
   created: string;
   modified: string;
+}
+
+// Respuesta del endpoint POST /api/tickets/print/
+export interface PrintTicketResponse {
+  success: boolean;
+  message?: string;
+  error?: string;
+  is_reprint: boolean;
+  ticket?: {
+    id: number;
+    ticket_number: string;
+    status: string;
+    valid_from: string;
+    valid_until: string;
+    person: {
+      id: number;
+      full_name: string;
+      document_number: string;
+      email?: string;
+    };
+    service: {
+      id: number;
+      name: string;
+      code: string;
+      time_from?: string;
+      time_to?: string;
+    };
+    event: {
+      id: number;
+      name: string;
+      code: string;
+      organization?: string;
+    };
+    usage: {
+      usage_date: string;
+      status: string;
+      printed_at: string;
+      printed_by: string;
+      notes: string | null;
+    };
+  };
 }
 
 // Ticket con usages[] y current_usage (nuevo formato API v2)
@@ -129,6 +172,7 @@ export interface ServicioComida {
   ticketId: number | null;
   ticketNumber: string | null;
   ticketStatus: string | null;
+  usageId: number | null; // ID del current_usage para actualizar estado
   timeFrom: string | null; // "09:00:00"
   timeTo: string | null; // "11:00:00"
   estadoHorario: EstadoHorario; // calculado según hora actual
@@ -214,23 +258,51 @@ export class CasinoService {
   }
 
   /**
-   * Actualiza el estado de un ticket (e.g. 'printed', 'redeemed')
-   * POST /api/person-tickets/{id}/update-status/
+   * Marca un ticket como impreso usando el nuevo endpoint
+   * POST /api/tickets/print/
+   * @param ticketNumber Número del ticket (ej: "EV0-20260206-57187")
+   * @param totemId Identificador del tótem (opcional)
+   */
+  printTicket(
+    ticketNumber: string,
+    totemId: string = 'TOTEM-01',
+  ): Observable<PrintTicketResponse> {
+    const url = `${this.API_URL}/tickets/print/`;
+    const payload = {
+      ticket_number: ticketNumber,
+      totem_id: totemId,
+    };
+    
+    console.log('🚀 [CasinoService] POST', url);
+    console.log('📤 Payload:', payload);
+    
+    return this.http.post<PrintTicketResponse>(url, payload).pipe(
+      tap({
+        next: (res) => console.log('✅ [CasinoService] Print ticket response:', res),
+        error: (err) => console.error('❌ [CasinoService] Print ticket error:', err),
+      }),
+    );
+  }
+
+  /**
+   * Actualiza el estado de un TicketUsage (e.g. 'printed', 'redeemed')
+   * @param usageId ID del current_usage (NO del ticket)
+   * @param status Nuevo estado
    */
   updateTicketStatus(
-    ticketId: number,
+    usageId: number,
     status: 'printed' | 'redeemed',
-  ): Observable<ApiPersonTicket> {
-    const url = `${this.API_URL}/person-tickets/${ticketId}/`;
+  ): Observable<ApiTicketUsage> {
+    const url = `${this.API_URL}/ticket-usages/${usageId}/`;
     const payload = { status };
     
     console.log('🚀 [CasinoService] PATCH', url);
     console.log('📤 Payload:', payload);
     
-    return this.http.patch<ApiPersonTicket>(url, payload).pipe(
+    return this.http.patch<ApiTicketUsage>(url, payload).pipe(
       tap({
-        next: (res) => console.log('✅ [CasinoService] Update ticket response:', res),
-        error: (err) => console.error('❌ [CasinoService] Update ticket error:', err),
+        next: (res) => console.log('✅ [CasinoService] Update usage response:', res),
+        error: (err) => console.error('❌ [CasinoService] Update usage error:', err),
       }),
     );
   }
@@ -281,6 +353,7 @@ export class CasinoService {
         ticketId: ticket ? ticket.id : null,
         ticketNumber: ticket ? ticket.ticket_number : null,
         ticketStatus,
+        usageId: ticket?.current_usage?.id || null,
         timeFrom: service.time_from,
         timeTo: service.time_to,
         estadoHorario: estado,

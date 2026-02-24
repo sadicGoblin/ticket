@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { Observable, of, delay } from 'rxjs';
+import { environment } from '../../environments/environment';
 
 export interface ProductoTicket {
   nombre: string;
@@ -63,6 +64,12 @@ export class PrinterService {
       eventoNombre: eventoNombre,
     };
 
+    // Mock para desarrollo sin impresora
+    if (environment.mockPrinter) {
+      console.log('🖨️ [MOCK] Simulando impresión:', datosTicket);
+      return of({ resultado: 'ok' as const, mensaje: 'Impresión simulada' }).pipe(delay(1000));
+    }
+
     return this.http.post<RespuestaImpresion>(
       `${this.PRINTER_URL}/imprimir`,
       datosTicket,
@@ -74,6 +81,9 @@ export class PrinterService {
    * @returns Observable<any>
    */
   verificarConexion(): Observable<any> {
+    if (environment.mockPrinter) {
+      return of({ status: 'ok', mock: true }).pipe(delay(500));
+    }
     return this.http.get(`${this.PRINTER_URL}/status`);
   }
 
@@ -101,6 +111,12 @@ export class PrinterService {
       nombreCliente: nombreCliente,
       numeroPedido: new Date().getTime().toString(),
     };
+
+    // Mock para desarrollo sin impresora
+    if (environment.mockPrinter) {
+      console.log('🍽️ [MOCK] Simulando impresión casino:', datosTicket);
+      return of({ resultado: 'ok' as const, mensaje: 'Impresión casino simulada' }).pipe(delay(1000));
+    }
 
     return this.http.post<RespuestaImpresion>(
       `${this.PRINTER_URL}/imprimir-casino`,

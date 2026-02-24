@@ -4,7 +4,6 @@
     <div class="top-bar-inner">
       <div class="brand">
         <img *ngIf="logoUrl" [src]="logoUrl" alt="Logo" class="brand-logo" />
-        <span class="brand-text">{{ brandName }}</span>
       </div>
 
       @if (currentStep === "login") {
