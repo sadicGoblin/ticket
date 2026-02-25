@@ -329,23 +329,23 @@ export class AgregarVisitanteComponent implements OnInit, OnDestroy {
 
   formatearRut(): void {
     let rut = this.documentNumber.replace(/[^0-9kK]/g, '');
-    
+
     // Limitar a 9 caracteres (8 números + 1 DV)
     if (rut.length > 9) {
       rut = rut.slice(0, 9);
     }
-    
+
     if (rut.length < 2) {
       this.documentNumber = rut;
       return;
     }
-    
+
     const dv = rut.slice(-1).toUpperCase();
     const numero = rut.slice(0, -1);
-    
+
     // Formatear con puntos de miles
     const numeroFormateado = numero.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
-    
+
     this.documentNumber = `${numeroFormateado}-${dv}`;
   }
 
@@ -407,7 +407,7 @@ export class AgregarVisitanteComponent implements OnInit, OnDestroy {
         supervisor_code: this.supervisorCode,
         supervisor_name: 'Supervisor',
         event_code: this.validatedEvent.code,
-        document_number: this.documentNumber,
+        document_number: this.documentNumber.replace(/\./g, ''),
         first_name: this.firstName,
         last_name: this.lastName,
       })

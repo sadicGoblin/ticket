@@ -2,34 +2,61 @@
   <!-- Top Bar -->
   <div class="top-bar">
     <div class="top-bar-inner">
-      <div class="brand">
-        <img
-          *ngIf="logoUrl"
-          class="brand-logo"
-          [src]="logoUrl"
-          [alt]="config.brand.name"
-        />
-      </div>
+      <div class="brand"></div>
       <div class="top-bar-actions">
         <!-- Indicador de conexión a internet -->
-        <div class="connection-status" [class.online]="isOnline" [class.offline]="!isOnline">
+        <div
+          class="connection-status"
+          [class.online]="isOnline"
+          [class.offline]="!isOnline"
+        >
           <svg *ngIf="isOnline" viewBox="0 0 24 24" fill="none">
-            <path d="M5 12.55a11 11 0 0114 0M8.53 16.11a6 6 0 016.95 0M12 20h.01" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            <path
+              d="M5 12.55a11 11 0 0114 0M8.53 16.11a6 6 0 016.95 0M12 20h.01"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            />
           </svg>
           <svg *ngIf="!isOnline" viewBox="0 0 24 24" fill="none">
-            <path d="M1 1l22 22M16.72 11.06A10.94 10.94 0 0119 12.55M5 12.55a10.94 10.94 0 015.17-2.39M10.71 5.05A16 16 0 0122.58 9M1.42 9a15.91 15.91 0 014.7-2.88M8.53 16.11a6 6 0 016.95 0M12 20h.01" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            <path
+              d="M1 1l22 22M16.72 11.06A10.94 10.94 0 0119 12.55M5 12.55a10.94 10.94 0 015.17-2.39M10.71 5.05A16 16 0 0122.58 9M1.42 9a15.91 15.91 0 014.7-2.88M8.53 16.11a6 6 0 016.95 0M12 20h.01"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            />
           </svg>
         </div>
         <!-- Botón Uso interno -->
-        <button 
-          class="btn-internal-use" 
+        <button
+          class="btn-internal-use"
           (click)="seleccionarFlujo('visitante')"
           *ngIf="config.flows.visitante_enabled"
         >
           <svg viewBox="0 0 24 24" fill="none">
-            <path d="M16 21v-2a4 4 0 00-4-4H6a4 4 0 00-4 4v2" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-            <circle cx="9" cy="7" r="4" stroke="currentColor" stroke-width="2"/>
-            <path d="M19 8v6M22 11h-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            <path
+              d="M16 21v-2a4 4 0 00-4-4H6a4 4 0 00-4 4v2"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            />
+            <circle
+              cx="9"
+              cy="7"
+              r="4"
+              stroke="currentColor"
+              stroke-width="2"
+            />
+            <path
+              d="M19 8v6M22 11h-6"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            />
           </svg>
           Uso interno
         </button>
@@ -41,50 +68,17 @@
   <!-- Contenido principal -->
   <div class="main-content">
     <div class="welcome-section">
+      <img
+        *ngIf="logoUrl"
+        class="welcome-logo"
+        [src]="logoUrl"
+        [alt]="config.brand.name"
+      />
       <h1>{{ config.brand.welcome_message }}</h1>
       <p class="welcome-desc">{{ config.brand.welcome_description }}</p>
     </div>
 
     <div class="cards-container">
-      <!-- Card Ticket Casino -->
-      <button
-        class="flow-card"
-        (click)="seleccionarFlujo('ticket')"
-        *ngIf="config.flows.ticket_enabled"
-      >
-        <div class="card-icon">
-          <svg
-            viewBox="0 0 24 24"
-            fill="none"
-            xmlns="http://www.w3.org/2000/svg"
-          >
-            <path
-              d="M22 10V6a2 2 0 00-2-2H4a2 2 0 00-2 2v4a2 2 0 010 4v4a2 2 0 002 2h16a2 2 0 002-2v-4a2 2 0 010-4zm-2-1.46a4 4 0 000 6.92V18H4v-2.54a4 4 0 000-6.92V6h16v2.54z"
-              fill="currentColor"
-            />
-            <path d="M11 15h2v2h-2zm0-8h2v6h-2z" fill="currentColor" />
-          </svg>
-        </div>
-        <div class="card-text">
-          <h2>{{ config.flows.ticket_label }}</h2>
-          <p>{{ config.flows.ticket_description }}</p>
-        </div>
-        <svg
-          class="card-arrow"
-          viewBox="0 0 24 24"
-          fill="none"
-          xmlns="http://www.w3.org/2000/svg"
-        >
-          <path
-            d="M9 18l6-6-6-6"
-            stroke="currentColor"
-            stroke-width="2.5"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-          />
-        </svg>
-      </button>
-
       <!-- Card Registro Asistencia -->
       <button
         class="flow-card"
@@ -114,6 +108,45 @@
         <div class="card-text">
           <h2>{{ config.flows.asistencia_label }}</h2>
           <p>{{ config.flows.asistencia_description }}</p>
+        </div>
+        <svg
+          class="card-arrow"
+          viewBox="0 0 24 24"
+          fill="none"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <path
+            d="M9 18l6-6-6-6"
+            stroke="currentColor"
+            stroke-width="2.5"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          />
+        </svg>
+      </button>
+
+      <!-- Card Ticket Casino -->
+      <button
+        class="flow-card"
+        (click)="seleccionarFlujo('ticket')"
+        *ngIf="config.flows.ticket_enabled"
+      >
+        <div class="card-icon">
+          <svg
+            viewBox="0 0 24 24"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              d="M22 10V6a2 2 0 00-2-2H4a2 2 0 00-2 2v4a2 2 0 010 4v4a2 2 0 002 2h16a2 2 0 002-2v-4a2 2 0 010-4zm-2-1.46a4 4 0 000 6.92V18H4v-2.54a4 4 0 000-6.92V6h16v2.54z"
+              fill="currentColor"
+            />
+            <path d="M11 15h2v2h-2zm0-8h2v6h-2z" fill="currentColor" />
+          </svg>
+        </div>
+        <div class="card-text">
+          <h2>{{ config.flows.ticket_label }}</h2>
+          <p>{{ config.flows.ticket_description }}</p>
         </div>
         <svg
           class="card-arrow"
@@ -198,7 +231,13 @@
   >
     <div class="password-panel" (click)="$event.stopPropagation()">
       <h3>Clave de Administrador</h3>
-      <p>{{ pendingAction === 'configurar' ? 'Ingrese la clave para cambiar configuración' : 'Ingrese la clave para salir del modo kiosco' }}</p>
+      <p>
+        {{
+          pendingAction === "configurar"
+            ? "Ingrese la clave para cambiar configuración"
+            : "Ingrese la clave para salir del modo kiosco"
+        }}
+      </p>
 
       <!-- PIN display -->
       <div class="pin-display">

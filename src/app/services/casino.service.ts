@@ -216,50 +216,50 @@ export class CasinoService {
 
     const url = `${this.API_URL}/person-events/`;
     const params = { document_number: rutSinPuntos };
-    
+
     console.log('🚀 [CasinoService] GET', url);
     console.log('📤 Params:', params);
-    
-    return this.http
-      .get<ApiPersonEventsResponse>(url, { params })
-      .pipe(
-        tap((res) => console.log('✅ [CasinoService] Person events response:', res)),
-        map((response) => {
-          if (response && response.person) {
-            const empleado: EmpleadoCasino = {
-              rut: response.person.document_number,
-              nombre: response.person.full_name,
-              persona: response.person,
-              eventos: response.events || [],
-            };
-            return {
-              success: true,
-              empleado,
-              mensaje: `Usuario encontrado: ${empleado.nombre}`,
-            };
-          }
-          return {
-            success: false,
-            mensaje: 'No se encontró información para este RUT',
+
+    return this.http.get<ApiPersonEventsResponse>(url, { params }).pipe(
+      tap((res) =>
+        console.log('✅ [CasinoService] Person events response:', res),
+      ),
+      map((response) => {
+        if (response && response.person) {
+          const empleado: EmpleadoCasino = {
+            rut: response.person.document_number,
+            nombre: response.person.full_name,
+            persona: response.person,
+            eventos: response.events || [],
           };
-        }),
-        catchError((error) => {
-          console.error('Error en API person-events:', error);
-          let mensaje = 'Error al conectar con el servidor';
-          if (error.status === 404) {
-            mensaje = 'RUT no encontrado en el sistema';
-          } else if (error.status === 0) {
-            mensaje =
-              'No se pudo conectar con el servidor. Verifique la conexión';
-          }
-          return of({ success: false, mensaje });
-        }),
-      );
+          return {
+            success: true,
+            empleado,
+            mensaje: `Usuario encontrado: ${empleado.nombre}`,
+          };
+        }
+        return {
+          success: false,
+          mensaje: 'No se encontró información para este RUT',
+        };
+      }),
+      catchError((error) => {
+        console.error('Error en API person-events:', error);
+        let mensaje = 'Error al conectar con el servidor';
+        if (error.status === 404) {
+          mensaje = 'RUT no encontrado en el sistema';
+        } else if (error.status === 0) {
+          mensaje =
+            'No se pudo conectar con el servidor. Verifique la conexión';
+        }
+        return of({ success: false, mensaje });
+      }),
+    );
   }
 
   /**
    * Marca un ticket como impreso usando el nuevo endpoint
-   * POST /api/tickets/print/
+   * POST /api/print-ticket/
    * @param ticketNumber Número del ticket (ej: "EV0-20260206-57187")
    * @param totemId Identificador del tótem (opcional)
    */
@@ -267,19 +267,21 @@ export class CasinoService {
     ticketNumber: string,
     totemId: string = 'TOTEM-01',
   ): Observable<PrintTicketResponse> {
-    const url = `${this.API_URL}/tickets/print/`;
+    const url = `${this.API_URL}/print-ticket/`;
     const payload = {
       ticket_number: ticketNumber,
       totem_id: totemId,
     };
-    
+
     console.log('🚀 [CasinoService] POST', url);
     console.log('📤 Payload:', payload);
-    
+
     return this.http.post<PrintTicketResponse>(url, payload).pipe(
       tap({
-        next: (res) => console.log('✅ [CasinoService] Print ticket response:', res),
-        error: (err) => console.error('❌ [CasinoService] Print ticket error:', err),
+        next: (res) =>
+          console.log('✅ [CasinoService] Print ticket response:', res),
+        error: (err) =>
+          console.error('❌ [CasinoService] Print ticket error:', err),
       }),
     );
   }
@@ -295,14 +297,16 @@ export class CasinoService {
   ): Observable<ApiTicketUsage> {
     const url = `${this.API_URL}/ticket-usages/${usageId}/`;
     const payload = { status };
-    
+
     console.log('🚀 [CasinoService] PATCH', url);
     console.log('📤 Payload:', payload);
-    
+
     return this.http.patch<ApiTicketUsage>(url, payload).pipe(
       tap({
-        next: (res) => console.log('✅ [CasinoService] Update usage response:', res),
-        error: (err) => console.error('❌ [CasinoService] Update usage error:', err),
+        next: (res) =>
+          console.log('✅ [CasinoService] Update usage response:', res),
+        error: (err) =>
+          console.error('❌ [CasinoService] Update usage error:', err),
       }),
     );
   }
@@ -314,14 +318,12 @@ export class CasinoService {
    */
   getServiciosDeEvento(evento: ApiEvent): ServicioComida[] {
     const ahora = new Date();
-    
+
     // Soportar ambos formatos: tickets (nuevo) o person_tickets (legacy)
     const tickets = evento.tickets || evento.person_tickets || [];
 
     return evento.services.map((service) => {
-      const ticket = tickets.find(
-        (pt) => pt.service.id === service.id,
-      );
+      const ticket = tickets.find((pt) => pt.service.id === service.id);
 
       // Obtener estado del ticket para HOY usando current_usage
       let ticketStatus: string | null = null;
@@ -391,7 +393,7 @@ export class CasinoService {
     const month = String(ahora.getMonth() + 1).padStart(2, '0');
     const day = String(ahora.getDate()).padStart(2, '0');
     const hoy = `${year}-${month}-${day}`;
-    
+
     const desde = new Date(`${hoy}T${timeFrom}`);
     const hasta = new Date(`${hoy}T${timeTo}`);
 

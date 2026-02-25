@@ -361,13 +361,23 @@ export class ComidaSeleccionComponent implements OnInit, OnDestroy {
             this.ticketImpreso = true;
             this.mostrarToast('Ticket impreso correctamente', 'success');
 
-            // Marcar como 'printed' en el servidor usando usageId
-            if (this.seleccionado?.usageId) {
+            // Marcar como 'printed' en el servidor usando POST /api/tickets/print/
+            if (this.seleccionado?.ticketNumber) {
               this.casinoService
-                .updateTicketStatus(this.seleccionado.usageId, 'printed')
+                .printTicket(this.seleccionado.ticketNumber)
                 .subscribe({
-                  next: () => {
-                    console.log('✅ Estado del ticket actualizado a printed');
+                  next: (printRes) => {
+                    if (printRes.success) {
+                      console.log(
+                        '✅ Ticket marcado como printed en servidor',
+                        printRes.is_reprint ? '(reimpresión)' : '',
+                      );
+                    } else {
+                      console.warn(
+                        '⚠️ Servidor respondió:',
+                        printRes.error || printRes.message,
+                      );
+                    }
                     if (this.seleccionado) {
                       this.seleccionado.ticketStatus = 'printed';
                       const svc = this.servicios.find(
@@ -378,7 +388,10 @@ export class ComidaSeleccionComponent implements OnInit, OnDestroy {
                     this.mostrarExitoImpresion();
                   },
                   error: (err) => {
-                    console.warn('⚠️ No se pudo actualizar estado:', err);
+                    console.warn(
+                      '⚠️ No se pudo marcar ticket como printed:',
+                      err,
+                    );
                     // Aún así mostrar éxito ya que la impresión física sí funcionó
                     this.mostrarExitoImpresion();
                   },
@@ -388,7 +401,9 @@ export class ComidaSeleccionComponent implements OnInit, OnDestroy {
             }
           } else {
             this.imprimiendo = false;
-            this.mostrarErrorImpresion('Error al imprimir. Intente nuevamente.');
+            this.mostrarErrorImpresion(
+              'Error al imprimir. Intente nuevamente.',
+            );
           }
         },
         error: () => {
@@ -412,7 +427,7 @@ export class ComidaSeleccionComponent implements OnInit, OnDestroy {
   mostrarExitoImpresion(): void {
     this.estadoImpresion = 'success';
     this.printingCountdown = 5;
-    
+
     // Countdown para cerrar sesión
     this.printingCountdownInterval = setInterval(() => {
       this.printingCountdown--;
