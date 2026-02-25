@@ -44,6 +44,7 @@ export class RutVerificationComponent implements OnDestroy {
   // Gestión de inactividad
   private inactivityTimeout: any = null;
   private countdownInterval: any = null;
+  private autoRedirectTimeout: any = null;
   private readonly INACTIVITY_TIME = 60000; // 60 segundos (1 minuto)
   tiempoRestante: number = 60;
   showInactivityTimer: boolean = false; // Cambiar a true para mostrar el contador
@@ -69,6 +70,7 @@ export class RutVerificationComponent implements OnDestroy {
   ngOnDestroy(): void {
     // Limpiar timers al destruir el componente
     this.clearInactivityTimer();
+    this.clearAutoRedirectTimer();
   }
 
   /**
@@ -101,6 +103,13 @@ export class RutVerificationComponent implements OnDestroy {
     if (this.countdownInterval) {
       clearInterval(this.countdownInterval);
       this.countdownInterval = null;
+    }
+  }
+
+  clearAutoRedirectTimer(): void {
+    if (this.autoRedirectTimeout) {
+      clearTimeout(this.autoRedirectTimeout);
+      this.autoRedirectTimeout = null;
     }
   }
 
@@ -301,7 +310,7 @@ export class RutVerificationComponent implements OnDestroy {
             this.ticketImpreso = true;
 
             // Resetear después de 5 segundos
-            setTimeout(() => {
+            this.autoRedirectTimeout = setTimeout(() => {
               this.resetearFormulario();
             }, 5000);
           } else {
@@ -354,6 +363,7 @@ export class RutVerificationComponent implements OnDestroy {
                 '🔓 Backend permite canjear tickets (modo automático), continuando a selección',
               );
             }
+            this.clearInactivityTimer();
             this.router.navigate(['/comida-seleccion']);
           } else {
             // No tiene check-in y no puede canjear
@@ -414,6 +424,7 @@ export class RutVerificationComponent implements OnDestroy {
         next: (response: CheckInResponse) => {
           console.log('✅ Check-in automático exitoso:', response);
           // Continuar a selección de comida
+          this.clearInactivityTimer();
           this.router.navigate(['/comida-seleccion']);
         },
         error: (error) => {
@@ -421,12 +432,14 @@ export class RutVerificationComponent implements OnDestroy {
           // Si ya existe, continuar de todos modos
           if (error.error?.existing_check_in) {
             console.log('ℹ️ Ya tenía check-in, continuando');
+            this.clearInactivityTimer();
             this.router.navigate(['/comida-seleccion']);
           } else {
             // Continuar de todos modos en modo permisivo
             console.log(
               '⚠️ Error en check-in auto, continuando de todos modos',
             );
+            this.clearInactivityTimer();
             this.router.navigate(['/comida-seleccion']);
           }
         },
@@ -461,6 +474,7 @@ export class RutVerificationComponent implements OnDestroy {
             this.checkInMessage = 'Asistencia registrada correctamente';
             // Esperar un momento y luego continuar
             setTimeout(() => {
+              this.clearInactivityTimer();
               this.router.navigate(['/comida-seleccion']);
             }, 1500);
           } else {
@@ -472,6 +486,7 @@ export class RutVerificationComponent implements OnDestroy {
           console.error('❌ Error en check-in manual:', error);
           if (error.error?.existing_check_in) {
             // Ya tenía check-in, puede continuar
+            this.clearInactivityTimer();
             this.router.navigate(['/comida-seleccion']);
           } else {
             this.checkInStatus = 'error';
@@ -518,7 +533,7 @@ export class RutVerificationComponent implements OnDestroy {
             console.log('✅ Check-in exitoso:', response.data);
 
             // Auto-volver al home después de 5 segundos
-            setTimeout(() => {
+            this.autoRedirectTimeout = setTimeout(() => {
               this.resetearFormulario();
             }, 5000);
           } else if (response.existing_check_in) {
@@ -530,7 +545,7 @@ export class RutVerificationComponent implements OnDestroy {
             console.log('ℹ️ Ya tiene check-in:', response.existing_check_in);
 
             // Auto-volver después de 5 segundos
-            setTimeout(() => {
+            this.autoRedirectTimeout = setTimeout(() => {
               this.resetearFormulario();
             }, 5000);
           } else {
@@ -549,7 +564,7 @@ export class RutVerificationComponent implements OnDestroy {
             this.checkInMessage = 'Ya registró asistencia hoy';
             this.checkInTime = error.error.existing_check_in.check_in_time;
 
-            setTimeout(() => {
+            this.autoRedirectTimeout = setTimeout(() => {
               this.resetearFormulario();
             }, 5000);
           } else {
@@ -579,6 +594,7 @@ export class RutVerificationComponent implements OnDestroy {
     this.checkInVerified = false;
     this.pendingEventCode = '';
     this.clearInactivityTimer();
+    this.clearAutoRedirectTimer();
     // Volver al inicio (home)
     this.router.navigate(['/home']);
   }
@@ -588,6 +604,7 @@ export class RutVerificationComponent implements OnDestroy {
    */
   volverAlMenu(): void {
     this.clearInactivityTimer();
+    this.clearAutoRedirectTimer();
     sessionStorage.removeItem('empleadoActual');
     sessionStorage.removeItem('flujoActual');
     this.router.navigate(['/home']);

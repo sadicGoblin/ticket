@@ -24,7 +24,7 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-    height: 100px;
+    height: 120px;
   }
 }
 
@@ -57,14 +57,14 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 40px;
-  height: 40px;
-  border-radius: 10px;
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
   transition: all 0.3s ease;
 
   svg {
-    width: 22px;
-    height: 22px;
+    width: 24px;
+    height: 24px;
   }
 
   &.online {
@@ -118,7 +118,7 @@
   max-width: 1000px;
   margin: 0 auto;
   width: 100%;
-  min-height: calc(100vh - 100px);
+  min-height: calc(100vh - 120px);
 }
 
 /* Welcome */
