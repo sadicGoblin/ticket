@@ -120,8 +120,8 @@ export class RutVerificationComponent implements OnDestroy {
     // Reiniciar el timer de inactividad
     this.resetInactivityTimer();
 
-    // Limitar longitud a 10 caracteres (incluye guión)
-    if (this.rut.length >= 10) {
+    // Limitar longitud a 9 caracteres (8 números + 1 DV)
+    if (this.rut.length >= 9) {
       return;
     }
 
@@ -334,11 +334,8 @@ export class RutVerificationComponent implements OnDestroy {
     empleado: EmpleadoCasino,
     evento: ApiEvent,
   ): void {
-    const rutLimpio = empleado.rut.replace(/[^\dkK]/g, '');
-    const documentNumber =
-      rutLimpio.length >= 2
-        ? rutLimpio.slice(0, -1) + '-' + rutLimpio.slice(-1).toUpperCase()
-        : rutLimpio;
+    // RUT limpio sin puntos ni guión para la API
+    const documentNumber = empleado.rut.replace(/[^\dkK]/g, '').toUpperCase();
 
     this.pendingEventCode = evento.code;
     console.log(
@@ -406,11 +403,8 @@ export class RutVerificationComponent implements OnDestroy {
     empleado: EmpleadoCasino,
     evento: ApiEvent,
   ): void {
-    const rutLimpio = empleado.rut.replace(/[^\dkK]/g, '');
-    const documentNumber =
-      rutLimpio.length >= 2
-        ? rutLimpio.slice(0, -1) + '-' + rutLimpio.slice(-1).toUpperCase()
-        : rutLimpio;
+    // RUT limpio sin puntos ni guión para la API
+    const documentNumber = empleado.rut.replace(/[^\dkK]/g, '').toUpperCase();
 
     this.checkInStatus = 'loading';
     this.checkInMessage = 'Registrando asistencia automáticamente...';
@@ -452,11 +446,10 @@ export class RutVerificationComponent implements OnDestroy {
   registrarAsistenciaManual(): void {
     if (!this.empleado || !this.pendingEventCode) return;
 
-    const rutLimpio = this.empleado.rut.replace(/[^\dkK]/g, '');
-    const documentNumber =
-      rutLimpio.length >= 2
-        ? rutLimpio.slice(0, -1) + '-' + rutLimpio.slice(-1).toUpperCase()
-        : rutLimpio;
+    // RUT limpio sin puntos ni guión para la API
+    const documentNumber = this.empleado.rut
+      .replace(/[^\dkK]/g, '')
+      .toUpperCase();
 
     this.checkInStatus = 'loading';
     this.checkInMessage = 'Registrando asistencia...';
@@ -512,12 +505,8 @@ export class RutVerificationComponent implements OnDestroy {
     this.checkInStatus = 'loading';
     this.checkInMessage = 'Registrando asistencia...';
 
-    // Formatear RUT con guión para la API
-    const rutLimpio = empleado.rut.replace(/[^\dkK]/g, '');
-    const documentNumber =
-      rutLimpio.length >= 2
-        ? rutLimpio.slice(0, -1) + '-' + rutLimpio.slice(-1).toUpperCase()
-        : rutLimpio;
+    // RUT limpio sin puntos ni guión para la API
+    const documentNumber = empleado.rut.replace(/[^\dkK]/g, '').toUpperCase();
 
     this.dailyAttendanceService
       .checkIn({

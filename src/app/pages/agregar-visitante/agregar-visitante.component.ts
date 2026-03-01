@@ -350,7 +350,10 @@ export class AgregarVisitanteComponent implements OnInit, OnDestroy {
   }
 
   verificarRut(): void {
-    const rutLimpio = this.documentNumber.replace(/[^0-9kK-]/g, '');
+    // RUT limpio sin puntos ni guión para la API
+    const rutLimpio = this.documentNumber
+      .replace(/[^0-9kK]/g, '')
+      .toUpperCase();
     if (rutLimpio.length < 8) {
       this.errorMessage = 'RUT incompleto';
       return;
@@ -407,7 +410,9 @@ export class AgregarVisitanteComponent implements OnInit, OnDestroy {
         supervisor_code: this.supervisorCode,
         supervisor_name: 'Supervisor',
         event_code: this.validatedEvent.code,
-        document_number: this.documentNumber.replace(/\./g, ''),
+        document_number: this.documentNumber
+          .replace(/[^0-9kK]/g, '')
+          .toUpperCase(),
         first_name: this.firstName,
         last_name: this.lastName,
       })

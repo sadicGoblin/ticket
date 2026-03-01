@@ -207,15 +207,11 @@ export class CasinoService {
    * Verifica persona y obtiene sus eventos/servicios desde la API real
    */
   verificarTicketCasino(rut: string): Observable<RespuestaVerificacion> {
-    const rutLimpio = this.limpiarRut(rut);
-    // Reconstruir con guión pero sin puntos: 18618839-K
-    const rutSinPuntos =
-      rutLimpio.length >= 2
-        ? rutLimpio.slice(0, -1) + '-' + rutLimpio.slice(-1)
-        : rutLimpio;
+    // RUT limpio sin puntos ni guión para la API
+    const rutLimpio = this.limpiarRut(rut).toUpperCase();
 
     const url = `${this.API_URL}/person-events/`;
-    const params = { document_number: rutSinPuntos };
+    const params = { document_number: rutLimpio };
 
     console.log('🚀 [CasinoService] GET', url);
     console.log('📤 Params:', params);
