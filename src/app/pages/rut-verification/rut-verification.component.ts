@@ -1,4 +1,4 @@
-import { Component, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
@@ -20,7 +20,7 @@ import { ApiEvent } from '../../services/casino.service';
   templateUrl: './rut-verification.component.html',
   styleUrl: './rut-verification.component.scss',
 })
-export class RutVerificationComponent implements OnDestroy {
+export class RutVerificationComponent implements OnInit, OnDestroy {
   rut: string = '';
   rutFormateado: string = '';
   verificando: boolean = false;
@@ -49,6 +49,12 @@ export class RutVerificationComponent implements OnDestroy {
   tiempoRestante: number = 60;
   showInactivityTimer: boolean = false; // Cambiar a true para mostrar el contador
 
+  // Modal de advertencia de inactividad
+  mostrarAvisoInactividad: boolean = false;
+  inactividadCountdown: number = 15;
+  private readonly INACTIVITY_WARNING_TIME = 15; // 15 segundos para responder
+  private inactividadInterval: any = null;
+
   brandName = '';
   logoUrl: string | null = null;
 
@@ -63,7 +69,11 @@ export class RutVerificationComponent implements OnDestroy {
     this.logoUrl = this.configService.orgLogoUrl;
     // Leer flujo actual desde sessionStorage
     this.flujoActual = sessionStorage.getItem('flujoActual') || '';
-    // Iniciar el timer de inactividad
+  }
+
+  ngOnInit(): void {
+    // Iniciar el timer de inactividad en ngOnInit (no en constructor)
+    console.log('🔄 RutVerification: ngOnInit - Iniciando timer de inactividad (60s)');
     this.resetInactivityTimer();
   }
 
@@ -71,6 +81,7 @@ export class RutVerificationComponent implements OnDestroy {
     // Limpiar timers al destruir el componente
     this.clearInactivityTimer();
     this.clearAutoRedirectTimer();
+    this.cerrarAvisoInactividad();
   }
 
   /**
@@ -78,6 +89,7 @@ export class RutVerificationComponent implements OnDestroy {
    */
   resetInactivityTimer(): void {
     this.clearInactivityTimer();
+    this.cerrarAvisoInactividad();
     this.tiempoRestante = 60;
 
     // Iniciar countdown
@@ -88,11 +100,50 @@ export class RutVerificationComponent implements OnDestroy {
       }
     }, 1000);
 
-    // Configurar timeout para resetear
+    // Configurar timeout para mostrar warning (no resetear directamente)
     this.inactivityTimeout = setTimeout(() => {
-      console.log('⏱️ Timeout por inactividad - Reseteando formulario');
-      this.resetearFormulario();
+      this.mostrarWarningInactividad();
     }, this.INACTIVITY_TIME);
+  }
+
+  /**
+   * Muestra el modal de advertencia de inactividad con countdown de 15s
+   */
+  private mostrarWarningInactividad(): void {
+    // Evitar crear múltiples intervalos
+    if (this.mostrarAvisoInactividad) return;
+    
+    console.log('⚠️ RutVerification: Mostrando modal de inactividad (15s countdown)');
+    this.mostrarAvisoInactividad = true;
+    this.inactividadCountdown = this.INACTIVITY_WARNING_TIME;
+
+    this.inactividadInterval = setInterval(() => {
+      this.inactividadCountdown--;
+      if (this.inactividadCountdown <= 0) {
+        this.cerrarAvisoInactividad();
+        console.log('⏱️ Timeout por inactividad - Volviendo al inicio');
+        this.resetearFormulario();
+      }
+    }, 1000);
+  }
+
+  /**
+   * El usuario confirma que necesita más tiempo
+   */
+  confirmarMasTiempo(): void {
+    this.cerrarAvisoInactividad();
+    this.resetInactivityTimer();
+  }
+
+  /**
+   * Cierra el modal de inactividad y limpia el interval
+   */
+  cerrarAvisoInactividad(): void {
+    this.mostrarAvisoInactividad = false;
+    if (this.inactividadInterval) {
+      clearInterval(this.inactividadInterval);
+      this.inactividadInterval = null;
+    }
   }
 
   clearInactivityTimer(): void {
@@ -584,6 +635,7 @@ export class RutVerificationComponent implements OnDestroy {
     this.pendingEventCode = '';
     this.clearInactivityTimer();
     this.clearAutoRedirectTimer();
+    this.cerrarAvisoInactividad();
     // Volver al inicio (home)
     this.router.navigate(['/home']);
   }
@@ -594,6 +646,7 @@ export class RutVerificationComponent implements OnDestroy {
   volverAlMenu(): void {
     this.clearInactivityTimer();
     this.clearAutoRedirectTimer();
+    this.cerrarAvisoInactividad();
     sessionStorage.removeItem('empleadoActual');
     sessionStorage.removeItem('flujoActual');
     this.router.navigate(['/home']);

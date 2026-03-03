@@ -193,8 +193,8 @@
     </div>
   </div>
 
-  <!-- Botón de acción fijo -->
-  <div class="action-footer" *ngIf="!mostrarPreviewTicket">
+  <!-- Botón de acción fijo - REMOVIDO: ahora se abre popup directamente al seleccionar -->
+  <!-- <div class="action-footer" *ngIf="!mostrarPreviewTicket">
     <button
       class="btn-confirmar"
       [disabled]="!seleccionado"
@@ -202,7 +202,7 @@
     >
       CONFIRMAR SELECCION
     </button>
-  </div>
+  </div> -->
 
   <!-- Modal aviso de reimpresión -->
   <div class="reprint-overlay" *ngIf="mostrarAvisoReimpresion">

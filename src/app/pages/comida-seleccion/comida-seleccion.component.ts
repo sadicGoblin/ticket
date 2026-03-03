@@ -219,6 +219,8 @@ export class ComidaSeleccionComponent implements OnInit, OnDestroy {
 
     this.seleccionado = servicio;
     this.resetInactivityTimer();
+    // Abrir directamente el popup de confirmación (sin paso intermedio)
+    this.confirmarSeleccion();
   }
 
   /**

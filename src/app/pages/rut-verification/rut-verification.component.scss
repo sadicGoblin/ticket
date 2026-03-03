@@ -745,6 +745,129 @@
   }
 }
 
+/* Modal de inactividad */
+.inactivity-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  animation: fadeIn 0.2s ease;
+}
+
+.inactivity-modal {
+  background: var(--wm-white);
+  border-radius: 24px;
+  padding: 48px 40px;
+  max-width: 480px;
+  width: 90%;
+  text-align: center;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  animation: scaleIn 0.3s ease;
+}
+
+.inactivity-icon-wrap {
+  width: 80px;
+  height: 80px;
+  margin: 0 auto 16px;
+  background: rgba(var(--wm-warning-rgb, 245, 124, 0), 0.1);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  svg {
+    width: 44px;
+    height: 44px;
+    color: var(--wm-warning, #f57c00);
+  }
+}
+
+.inactivity-countdown-circle {
+  width: 100px;
+  height: 100px;
+  margin: 0 auto 20px;
+  background: rgba(var(--wm-warning-rgb, 245, 124, 0), 0.1);
+  border: 4px solid var(--wm-warning, #f57c00);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.inactivity-countdown-number {
+  font-size: 3rem;
+  font-weight: 700;
+  color: var(--wm-warning, #f57c00);
+}
+
+.inactivity-title {
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--wm-gray-900);
+  margin: 0 0 12px;
+}
+
+.inactivity-desc {
+  font-size: 1.2rem;
+  color: var(--wm-gray-600);
+  margin: 0 0 28px;
+  line-height: 1.5;
+
+  strong {
+    color: var(--wm-warning, #f57c00);
+  }
+}
+
+.inactivity-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.btn-mas-tiempo {
+  width: 100%;
+  padding: 20px;
+  font-size: 1.2rem;
+  font-weight: 700;
+  border: none;
+  border-radius: 14px;
+  background: var(--wm-blue);
+  color: var(--wm-white);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-family: "Inter", sans-serif;
+
+  &:hover {
+    background: var(--wm-blue-dark);
+  }
+
+  &:active {
+    transform: scale(0.98);
+  }
+}
+
+.btn-cerrar-sesion {
+  width: 100%;
+  padding: 16px;
+  font-size: 1.1rem;
+  font-weight: 600;
+  border: 2px solid var(--wm-gray-300);
+  border-radius: 14px;
+  background: var(--wm-white);
+  color: var(--wm-gray-600);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-family: "Inter", sans-serif;
+
+  &:hover {
+    border-color: var(--wm-gray-400);
+    background: var(--wm-gray-50);
+  }
+}
+
 /* Kiosk portrait 1080x1920 */
 @media (min-height: 1200px) {
   .main-view {
@@ -779,5 +902,32 @@
   .btn-siguiente {
     padding: 32px;
     font-size: 2.2rem;
+  }
+
+  .inactivity-modal {
+    padding: 56px 48px;
+    max-width: 540px;
+  }
+
+  .inactivity-countdown-circle {
+    width: 120px;
+    height: 120px;
+  }
+
+  .inactivity-countdown-number {
+    font-size: 3.5rem;
+  }
+
+  .inactivity-title {
+    font-size: 2.4rem;
+  }
+
+  .inactivity-desc {
+    font-size: 1.4rem;
+  }
+
+  .btn-mas-tiempo {
+    padding: 24px;
+    font-size: 1.4rem;
   }
 }
