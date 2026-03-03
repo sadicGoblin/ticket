@@ -231,6 +231,34 @@
     </div>
   </div>
 
+  <!-- Modal aviso de NO reimpresión permitida -->
+  <div class="reprint-overlay" *ngIf="mostrarAvisoNoReimpresion">
+    <div class="reprint-modal no-reprint">
+      <div class="reprint-icon-wrap error">
+        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path
+            d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm-1-13h2v6h-2zm0 8h2v2h-2z"
+            fill="currentColor"
+          />
+        </svg>
+      </div>
+      <h3 class="reprint-title">Ticket ya impreso</h3>
+      <p class="reprint-desc">
+        Este ticket ya fue impreso anteriormente y
+        <strong>no está permitida la reimpresión</strong> para este evento. Si
+        necesita ayuda, contacte al organizador.
+      </p>
+      <div class="reprint-actions">
+        <button
+          class="btn-reprint-cancel full-width"
+          (click)="cerrarAvisoNoReimpresion()"
+        >
+          Entendido
+        </button>
+      </div>
+    </div>
+  </div>
+
   <!-- Preview del Ticket -->
   <div
     class="ticket-preview-overlay"
@@ -372,28 +400,40 @@
   <!-- Overlay de impresión (bloquea toda la pantalla) -->
   <div class="printing-overlay" *ngIf="estadoImpresion !== 'idle'">
     <div class="printing-modal">
-      @if (estadoImpresion === 'printing') {
+      @if (estadoImpresion === "printing") {
         <div class="printing-spinner"></div>
         <h2 class="printing-title">Imprimiendo...</h2>
-        <p class="printing-desc">Por favor espere mientras se imprime su ticket</p>
-      } @else if (estadoImpresion === 'success') {
+        <p class="printing-desc">
+          Por favor espere mientras se imprime su ticket
+        </p>
+      } @else if (estadoImpresion === "success") {
         <div class="printing-success-icon">
           <svg viewBox="0 0 24 24" fill="none">
-            <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z" fill="currentColor"/>
+            <path
+              d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z"
+              fill="currentColor"
+            />
           </svg>
         </div>
         <h2 class="printing-title success">¡Ticket Impreso!</h2>
         <p class="printing-desc">Retire su ticket de la impresora</p>
-        <p class="printing-countdown">Cerrando sesión en {{ printingCountdown }}s...</p>
-      } @else if (estadoImpresion === 'error') {
+        <p class="printing-countdown">
+          Cerrando sesión en {{ printingCountdown }}s...
+        </p>
+      } @else if (estadoImpresion === "error") {
         <div class="printing-error-icon">
           <svg viewBox="0 0 24 24" fill="none">
-            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z" fill="currentColor"/>
+            <path
+              d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"
+              fill="currentColor"
+            />
           </svg>
         </div>
         <h2 class="printing-title error">Error de Impresión</h2>
         <p class="printing-desc">{{ printingErrorMessage }}</p>
-        <button class="btn-retry" (click)="cerrarOverlayImpresion()">Intentar de nuevo</button>
+        <button class="btn-retry" (click)="cerrarOverlayImpresion()">
+          Intentar de nuevo
+        </button>
       }
     </div>
   </div>

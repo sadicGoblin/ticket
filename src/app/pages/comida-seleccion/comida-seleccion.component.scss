@@ -956,6 +956,14 @@
       height: 32px;
       color: var(--wm-accent);
     }
+
+    &.error {
+      background: rgba(var(--wm-error-rgb, 222, 28, 36), 0.12);
+
+      svg {
+        color: var(--wm-error, #de1c24);
+      }
+    }
   }
 
   .reprint-title {
@@ -996,6 +1004,17 @@
 
       &:hover {
         background: var(--wm-gray-200);
+      }
+
+      &.full-width {
+        width: 100%;
+        background: var(--wm-blue);
+        color: var(--wm-white);
+        border: none;
+
+        &:hover {
+          background: var(--wm-blue-dark);
+        }
       }
     }
 

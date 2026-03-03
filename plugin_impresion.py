@@ -180,10 +180,18 @@ def generar_ticket(pedido):
     # Evento y nombre de persona
     evento_nombre = pedido.get("eventoNombre", "")
     if evento_nombre:
-        ticket += centrar(evento_nombre).encode("cp437") + NL
+        # Normalizar caracteres especiales para cp437
+        evento_limpio = evento_nombre.replace("á", "a").replace("é", "e").replace("í", "i").replace("ó", "o").replace("ú", "u")
+        evento_limpio = evento_limpio.replace("Á", "A").replace("É", "E").replace("Í", "I").replace("Ó", "O").replace("Ú", "U")
+        evento_limpio = evento_limpio.replace("ñ", "n").replace("Ñ", "N")
+        ticket += centrar(evento_limpio).encode("cp437", errors="replace") + NL
     nombre_cliente = pedido.get("nombreCliente", "")
     if nombre_cliente:
-        ticket += centrar(nombre_cliente).encode("cp437") + NL
+        # Normalizar caracteres especiales para cp437
+        nombre_limpio = nombre_cliente.replace("á", "a").replace("é", "e").replace("í", "i").replace("ó", "o").replace("ú", "u")
+        nombre_limpio = nombre_limpio.replace("Á", "A").replace("É", "E").replace("Í", "I").replace("Ó", "O").replace("Ú", "U")
+        nombre_limpio = nombre_limpio.replace("ñ", "n").replace("Ñ", "N")
+        ticket += centrar(nombre_limpio).encode("cp437", errors="replace") + NL
 
     ticket += NL
 
@@ -218,9 +226,10 @@ def imprimir():
             nombre_impresora = data.get("nombreImpresora", "SimulatedPrinter")
         contenido = generar_ticket(data)
         logging.info("Ticket generado: %d bytes, impresora: %s", len(contenido), nombre_impresora)
-        logging.info("Datos recibidos - RUT: %s, Nombre: %s, Pedido: %s, TicketNumber: %s",
+        logging.info("Datos recibidos - RUT: %s, Nombre: %s, Pedido: %s, TicketNumber: %s, Evento: %s, Brand: %s",
                      data.get('rut', 'N/A'), data.get('nombreCliente', 'N/A'),
-                     data.get('numeroPedido', 'N/A'), data.get('ticketNumber', 'N/A'))
+                     data.get('numeroPedido', 'N/A'), data.get('ticketNumber', 'N/A'),
+                     data.get('eventoNombre', 'N/A'), data.get('brandName', 'N/A'))
         exito = enviar_a_impresora(nombre_impresora, contenido)
         
         return jsonify({

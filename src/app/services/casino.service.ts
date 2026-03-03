@@ -138,6 +138,7 @@ export interface ApiEvent {
   status: string;
   is_active_event: boolean;
   check_in_required: boolean; // true = restrictivo, false = permisivo (auto check-in)
+  allow_ticket_reprint: boolean; // true = permite reimprimir, false = solo una impresión
   attendee_info: ApiAttendeeInfo;
   services: ApiService[];
   person_tickets?: ApiPersonTicket[]; // legacy

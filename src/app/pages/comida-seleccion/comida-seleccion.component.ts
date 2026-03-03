@@ -30,6 +30,7 @@ export class ComidaSeleccionComponent implements OnInit, OnDestroy {
   qrDataUrl: string = '';
   mostrarAvisoReimpresion: boolean = false;
   servicioReimpresion: ServicioComida | null = null;
+  mostrarAvisoNoReimpresion: boolean = false; // Modal cuando reimpresión no permitida
 
   // Toast notification
   toastVisible: boolean = false;
@@ -190,7 +191,8 @@ export class ComidaSeleccionComponent implements OnInit, OnDestroy {
   /**
    * Selecciona un servicio de comida.
    * - redeemed: bloqueado, no se puede seleccionar.
-   * - printed: muestra aviso de reimpresión.
+   * - printed + allow_ticket_reprint=false: bloqueado, muestra aviso.
+   * - printed + allow_ticket_reprint=true: muestra aviso de reimpresión.
    * - pending/disponible: selección normal.
    */
   seleccionarComida(servicio: ServicioComida): void {
@@ -199,8 +201,16 @@ export class ComidaSeleccionComponent implements OnInit, OnDestroy {
     // Ticket ya cobrado → bloqueado
     if (servicio.ticketStatus === 'redeemed') return;
 
-    // Ticket ya impreso → mostrar aviso de reimpresión
+    // Ticket ya impreso
     if (servicio.ticketStatus === 'printed') {
+      // Verificar si el evento permite reimpresión
+      if (this.eventoActual?.allow_ticket_reprint === false) {
+        // No permite reimpresión → mostrar aviso bloqueante
+        this.mostrarAvisoNoReimpresion = true;
+        this.resetInactivityTimer();
+        return;
+      }
+      // Permite reimpresión → mostrar aviso de reimpresión
       this.servicioReimpresion = servicio;
       this.mostrarAvisoReimpresion = true;
       this.resetInactivityTimer();
@@ -228,6 +238,14 @@ export class ComidaSeleccionComponent implements OnInit, OnDestroy {
   cancelarReimpresion(): void {
     this.mostrarAvisoReimpresion = false;
     this.servicioReimpresion = null;
+    this.resetInactivityTimer();
+  }
+
+  /**
+   * Cierra el aviso de no reimpresión permitida
+   */
+  cerrarAvisoNoReimpresion(): void {
+    this.mostrarAvisoNoReimpresion = false;
     this.resetInactivityTimer();
   }
 

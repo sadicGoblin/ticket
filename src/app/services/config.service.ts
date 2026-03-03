@@ -49,6 +49,7 @@ export interface ApiEvent {
   date_end?: string;
   status: string;
   is_active_event?: boolean;
+  allow_ticket_reprint?: boolean; // true = permite reimprimir, false = solo una impresión
 }
 
 export interface ApiEventAttendanceResponse {
@@ -235,9 +236,12 @@ export class ConfigService {
           this.logoUrl$.next(response.logo_url || response.logo || null);
 
           // Extraer data del primer template activo
-          const template = response.active_templates?.[0] || response.templates?.[0];
+          const template =
+            response.active_templates?.[0] || response.templates?.[0];
           if (!template?.data) {
-            console.warn('⚠️ Organización sin template, usando configuración por defecto');
+            console.warn(
+              '⚠️ Organización sin template, usando configuración por defecto',
+            );
             return null;
           }
           return template.data;
