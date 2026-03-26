@@ -746,6 +746,55 @@
       height: 42px;
     }
   }
+
+  .nps-section {
+    margin-top: 60px;
+    max-width: 90%;
+  }
+
+  .nps-title {
+    font-size: 1.8rem;
+  }
+
+  .nps-faces {
+    gap: 20px;
+  }
+
+  .nps-face {
+    padding: 20px 26px;
+    border-radius: 22px;
+  }
+
+  .nps-emoji {
+    font-size: 3.2rem;
+  }
+
+  .nps-label {
+    font-size: 1.05rem;
+  }
+
+  .nps-followup-title {
+    font-size: 1.4rem;
+  }
+
+  .nps-option {
+    padding: 16px 32px;
+    font-size: 1.25rem;
+  }
+
+  .nps-submit {
+    padding: 20px 72px;
+    font-size: 1.4rem;
+    border-radius: 18px;
+  }
+
+  .nps-thanks-emoji {
+    font-size: 4rem;
+  }
+
+  .nps-thanks-text {
+    font-size: 1.8rem;
+  }
 }
 
 /* Responsive (smaller screens) */
@@ -799,5 +848,40 @@
     .card-text h2 {
       font-size: 1.3rem;
     }
+  }
+
+  .nps-section {
+    margin-top: 32px;
+  }
+
+  .nps-title {
+    font-size: 1.1rem;
+  }
+
+  .nps-faces {
+    gap: 8px;
+  }
+
+  .nps-face {
+    padding: 10px 12px;
+    border-radius: 14px;
+  }
+
+  .nps-emoji {
+    font-size: 1.8rem;
+  }
+
+  .nps-label {
+    font-size: 0.7rem;
+  }
+
+  .nps-option {
+    padding: 10px 18px;
+    font-size: 0.9rem;
+  }
+
+  .nps-submit {
+    padding: 12px 40px;
+    font-size: 1rem;
   }
 }
