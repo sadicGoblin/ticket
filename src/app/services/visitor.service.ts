@@ -137,12 +137,39 @@ export class VisitorService {
   }
 
   /**
-   * Obtener lista de eventos
+   * Obtener lista de eventos.
+   * Por defecto usa today=true para traer solo eventos que incluyen el día de hoy.
+   *
+   * Filtros soportados:
+   * - today: true (default) → eventos cuyo rango de fechas incluye hoy
+   * - status: 'active' | 'pending' | 'finished' | 'cancelled' | 'draft' | 'suspended'
+   *   (solo aplica cuando today NO está activo, ya que el backend lo ignora con today=true)
+   * - date: string → filtro por fecha específica
    */
-  getEventsToday(date?: string): Observable<EventsTodayResponse> {
-    const url = date
-      ? `${this.API_URL}/events/?date=${date}`
-      : `${this.API_URL}/events/`;
+  getEvents(params?: {
+    today?: boolean;
+    status?: string;
+    date?: string;
+  }): Observable<EventsTodayResponse> {
+    const queryParts: string[] = [];
+
+    // Construir query params solo si tienen valor (evitar params vacíos)
+    if (params?.today !== false) {
+      // today=true es el default
+      queryParts.push('today=true');
+    }
+
+    if (params?.status && !params?.today) {
+      // status solo aplica cuando today NO está activo
+      queryParts.push(`status=${params.status}`);
+    }
+
+    if (params?.date) {
+      queryParts.push(`date=${params.date}`);
+    }
+
+    const queryString = queryParts.length > 0 ? `?${queryParts.join('&')}` : '';
+    const url = `${this.API_URL}/events/${queryString}`;
 
     console.log('🚀 [VisitorService] GET', url);
 
@@ -157,6 +184,13 @@ export class VisitorService {
         error: (err) => console.error('❌ [VisitorService] Error:', err),
       }),
     );
+  }
+
+  /**
+   * @deprecated Usar getEvents() en su lugar. Mantener por compatibilidad.
+   */
+  getEventsToday(date?: string): Observable<EventsTodayResponse> {
+    return this.getEvents(date ? { date, today: false } : {});
   }
 
   /**

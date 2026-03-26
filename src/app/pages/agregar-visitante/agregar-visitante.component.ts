@@ -86,7 +86,7 @@ export class AgregarVisitanteComponent implements OnInit, OnDestroy {
 
   loadEvents(): void {
     this.loadingEvents = true;
-    this.visitorService.getEventsToday().subscribe({
+    this.visitorService.getEvents({ today: true }).subscribe({
       next: (response) => {
         this.loadingEvents = false;
         // Solo eventos con código de supervisor
