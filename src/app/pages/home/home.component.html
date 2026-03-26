@@ -164,6 +164,53 @@
         </svg>
       </button>
     </div>
+
+    <!-- NPS Section -->
+    <div class="nps-section" *ngIf="!npsSubmitted">
+      <p class="nps-title">¿Cómo fue tu experiencia?</p>
+      <div class="nps-faces">
+        <button
+          *ngFor="let face of npsFaces"
+          class="nps-face"
+          [class.selected]="npsRating === face.value"
+          (click)="selectNpsRating(face.value)"
+        >
+          <span class="nps-emoji">{{ face.emoji }}</span>
+          <span class="nps-label">{{ face.label }}</span>
+        </button>
+      </div>
+
+      <!-- Follow-up para calificación positiva (4 o 5) -->
+      <div class="nps-followup" *ngIf="npsRating !== null && npsRating >= 4">
+        <p class="nps-followup-title">¿Qué te gustó? <span class="nps-optional">(opcional)</span></p>
+        <div class="nps-options">
+          <button
+            *ngFor="let opt of npsPositiveOptions"
+            class="nps-option"
+            [class.active]="npsFollowUp.includes(opt)"
+            (click)="toggleFollowUp(opt)"
+          >
+            {{ opt }}
+          </button>
+        </div>
+      </div>
+
+      <!-- Botón enviar -->
+      <button
+        class="nps-submit"
+        *ngIf="npsRating !== null"
+        [disabled]="npsSending"
+        (click)="submitNps()"
+      >
+        {{ npsSending ? 'Enviando...' : 'Enviar' }}
+      </button>
+    </div>
+
+    <!-- NPS enviado -->
+    <div class="nps-section nps-thanks" *ngIf="npsSubmitted">
+      <span class="nps-thanks-emoji">🙏</span>
+      <p class="nps-thanks-text">¡Gracias por tu opinión!</p>
+    </div>
   </div>
 
   <!-- Hidden admin trigger (bottom-left corner) -->

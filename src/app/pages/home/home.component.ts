@@ -20,6 +20,23 @@ export class HomeComponent implements OnInit, OnDestroy {
   private onlineHandler = () => this.updateOnlineStatus(true);
   private offlineHandler = () => this.updateOnlineStatus(false);
 
+  // NPS
+  npsRating: number | null = null;
+  npsFollowUp: string[] = [];
+  npsSubmitted: boolean = false;
+  npsSending: boolean = false;
+  readonly npsFaces = [
+    { value: 1, emoji: '😡', label: 'Muy mal' },
+    { value: 2, emoji: '😕', label: 'Mal' },
+    { value: 3, emoji: '😐', label: 'Regular' },
+    { value: 4, emoji: '😊', label: 'Bien' },
+    { value: 5, emoji: '😍', label: 'Excelente' },
+  ];
+  readonly npsPositiveOptions = [
+    'Fue fácil de usar',
+    'El proceso fue rápido',
+  ];
+
   // Admin panel
   private tapCount = 0;
   private tapTimer: any = null;
@@ -156,5 +173,47 @@ export class HomeComponent implements OnInit, OnDestroy {
     this.showPasswordModal = true;
     this.adminPassword = '';
     this.passwordError = '';
+  }
+
+  // ── NPS ──
+
+  selectNpsRating(value: number): void {
+    this.npsRating = value;
+    this.npsFollowUp = [];
+  }
+
+  toggleFollowUp(option: string): void {
+    const idx = this.npsFollowUp.indexOf(option);
+    if (idx >= 0) {
+      this.npsFollowUp.splice(idx, 1);
+    } else {
+      this.npsFollowUp.push(option);
+    }
+  }
+
+  submitNps(): void {
+    if (!this.npsRating) return;
+    this.npsSending = true;
+
+    // Simular envío (reemplazar con llamada real a API)
+    console.log('📊 NPS enviado:', {
+      rating: this.npsRating,
+      followUp: this.npsFollowUp,
+    });
+
+    setTimeout(() => {
+      this.npsSending = false;
+      this.npsSubmitted = true;
+
+      // Reset después de 4 segundos
+      setTimeout(() => this.resetNps(), 4000);
+    }, 600);
+  }
+
+  private resetNps(): void {
+    this.npsRating = null;
+    this.npsFollowUp = [];
+    this.npsSubmitted = false;
+    this.npsSending = false;
   }
 }
