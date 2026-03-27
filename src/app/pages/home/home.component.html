@@ -180,9 +180,28 @@
         </button>
       </div>
 
+      <!-- Follow-up para calificación negativa (1, 2 o 3) -->
+      <div class="nps-followup" *ngIf="npsRating !== null && npsRating <= 3">
+        <p class="nps-followup-title">
+          ¿Qué podemos mejorar? <span class="nps-optional">(opcional)</span>
+        </p>
+        <div class="nps-options">
+          <button
+            *ngFor="let opt of npsNegativeOptions"
+            class="nps-option"
+            [class.active]="npsFollowUp.includes(opt)"
+            (click)="toggleFollowUp(opt)"
+          >
+            {{ opt }}
+          </button>
+        </div>
+      </div>
+
       <!-- Follow-up para calificación positiva (4 o 5) -->
       <div class="nps-followup" *ngIf="npsRating !== null && npsRating >= 4">
-        <p class="nps-followup-title">¿Qué te gustó? <span class="nps-optional">(opcional)</span></p>
+        <p class="nps-followup-title">
+          ¿Qué te gustó? <span class="nps-optional">(opcional)</span>
+        </p>
         <div class="nps-options">
           <button
             *ngFor="let opt of npsPositiveOptions"
@@ -202,7 +221,7 @@
         [disabled]="npsSending"
         (click)="submitNps()"
       >
-        {{ npsSending ? 'Enviando...' : 'Enviar' }}
+        {{ npsSending ? "Enviando..." : "Enviar" }}
       </button>
     </div>
 

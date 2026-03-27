@@ -32,9 +32,12 @@ export class HomeComponent implements OnInit, OnDestroy {
     { value: 4, emoji: '😊', label: 'Bien' },
     { value: 5, emoji: '😍', label: 'Excelente' },
   ];
-  readonly npsPositiveOptions = [
-    'Fue fácil de usar',
-    'El proceso fue rápido',
+  readonly npsPositiveOptions = ['Fue fácil de usar', 'El proceso fue rápido'];
+  readonly npsNegativeOptions = [
+    'Es difícil de usar',
+    'El proceso es muy lento',
+    'No encontré lo que buscaba',
+    'Tuve problemas técnicos',
   ];
 
   // Admin panel
