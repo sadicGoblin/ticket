@@ -180,12 +180,18 @@
         </button>
       </div>
 
-      <!-- Follow-up para calificación positiva (4 o 5) -->
-      <div class="nps-followup" *ngIf="npsRating !== null && npsRating >= 4">
-        <p class="nps-followup-title">¿Qué te gustó? <span class="nps-optional">(opcional)</span></p>
+      <!-- Follow-up: chips del catálogo del backend para el rate seleccionado -->
+      <div
+        class="nps-followup"
+        *ngIf="currentNpsOption && currentNpsOption.chips.length > 0"
+      >
+        <p class="nps-followup-title">
+          {{ currentNpsOption.description }}
+          <span class="nps-optional">(opcional)</span>
+        </p>
         <div class="nps-options">
           <button
-            *ngFor="let opt of npsPositiveOptions"
+            *ngFor="let opt of currentNpsOption.chips"
             class="nps-option"
             [class.active]="npsFollowUp.includes(opt)"
             (click)="toggleFollowUp(opt)"
@@ -194,6 +200,9 @@
           </button>
         </div>
       </div>
+
+      <!-- Mensaje de error -->
+      <p class="nps-error" *ngIf="npsError">{{ npsError }}</p>
 
       <!-- Botón enviar -->
       <button

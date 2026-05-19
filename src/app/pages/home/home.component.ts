@@ -2,6 +2,10 @@ import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { ConfigService } from '../../services/config.service';
+import {
+  AppRatingService,
+  AppRatingOption,
+} from '../../services/app-rating.service';
 import { PrinterStatusComponent } from '../../components/printer-status/printer-status.component';
 
 @Component({
@@ -20,21 +24,20 @@ export class HomeComponent implements OnInit, OnDestroy {
   private onlineHandler = () => this.updateOnlineStatus(true);
   private offlineHandler = () => this.updateOnlineStatus(false);
 
-  // NPS
+  // NPS (AppRating)
   npsRating: number | null = null;
   npsFollowUp: string[] = [];
   npsSubmitted: boolean = false;
   npsSending: boolean = false;
+  npsError: string = '';
+  npsOptions: AppRatingOption[] = [];
+  npsOptionsLoaded: boolean = false;
   readonly npsFaces = [
     { value: 1, emoji: '😡', label: 'Muy mal' },
     { value: 2, emoji: '😕', label: 'Mal' },
     { value: 3, emoji: '😐', label: 'Regular' },
     { value: 4, emoji: '😊', label: 'Bien' },
     { value: 5, emoji: '😍', label: 'Excelente' },
-  ];
-  readonly npsPositiveOptions = [
-    'Fue fácil de usar',
-    'El proceso fue rápido',
   ];
 
   // Admin panel
@@ -51,6 +54,7 @@ export class HomeComponent implements OnInit, OnDestroy {
   constructor(
     private router: Router,
     private configService: ConfigService,
+    private appRatingService: AppRatingService,
   ) {
     // Limpiar cualquier flujo previo al volver al home
     sessionStorage.removeItem('flujoActual');
@@ -61,6 +65,26 @@ export class HomeComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     window.addEventListener('online', this.onlineHandler);
     window.addEventListener('offline', this.offlineHandler);
+    this.loadNpsOptions();
+  }
+
+  private loadNpsOptions(): void {
+    this.appRatingService.getOptions().subscribe({
+      next: (response) => {
+        this.npsOptions = response.options || [];
+        this.npsOptionsLoaded = true;
+      },
+      error: (err) => {
+        console.warn('⚠️ No se pudieron cargar las opciones de rating:', err);
+        this.npsOptions = [];
+        this.npsOptionsLoaded = false;
+      },
+    });
+  }
+
+  get currentNpsOption(): AppRatingOption | null {
+    if (this.npsRating === null) return null;
+    return this.npsOptions.find((o) => o.rate === this.npsRating) || null;
   }
 
   ngOnDestroy(): void {
@@ -175,11 +199,12 @@ export class HomeComponent implements OnInit, OnDestroy {
     this.passwordError = '';
   }
 
-  // ── NPS ──
+  // ── NPS (AppRating) ──
 
   selectNpsRating(value: number): void {
     this.npsRating = value;
     this.npsFollowUp = [];
+    this.npsError = '';
   }
 
   toggleFollowUp(option: string): void {
@@ -192,22 +217,47 @@ export class HomeComponent implements OnInit, OnDestroy {
   }
 
   submitNps(): void {
-    if (!this.npsRating) return;
+    if (!this.npsRating || this.npsSending) return;
+
+    const orgCode = this.configService.orgCode;
+    if (!orgCode) {
+      this.npsError = 'Tótem sin organización configurada.';
+      return;
+    }
+
     this.npsSending = true;
+    this.npsError = '';
 
-    // Simular envío (reemplazar con llamada real a API)
-    console.log('📊 NPS enviado:', {
-      rating: this.npsRating,
-      followUp: this.npsFollowUp,
-    });
+    this.appRatingService
+      .submit({
+        rate: this.npsRating,
+        selected_chips: this.npsFollowUp,
+        organization_code: orgCode,
+      })
+      .subscribe({
+        next: () => {
+          this.npsSending = false;
+          this.npsSubmitted = true;
+          // Reset después de 4 segundos
+          setTimeout(() => this.resetNps(), 4000);
+        },
+        error: (err) => {
+          this.npsSending = false;
+          this.npsError = this.extractErrorMessage(err);
+        },
+      });
+  }
 
-    setTimeout(() => {
-      this.npsSending = false;
-      this.npsSubmitted = true;
-
-      // Reset después de 4 segundos
-      setTimeout(() => this.resetNps(), 4000);
-    }, 600);
+  private extractErrorMessage(err: any): string {
+    const body = err?.error;
+    if (body && typeof body === 'object') {
+      for (const key of Object.keys(body)) {
+        const v = body[key];
+        if (Array.isArray(v) && v.length > 0) return String(v[0]);
+        if (typeof v === 'string') return v;
+      }
+    }
+    return 'No se pudo enviar la valoración.';
   }
 
   private resetNps(): void {
@@ -215,5 +265,6 @@ export class HomeComponent implements OnInit, OnDestroy {
     this.npsFollowUp = [];
     this.npsSubmitted = false;
     this.npsSending = false;
+    this.npsError = '';
   }
 }
