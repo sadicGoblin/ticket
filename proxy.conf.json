@@ -1,6 +1,6 @@
 {
   "/api": {
-    "target": "https://ticket-services.favric.cl",
+    "target": "https://ticket-services.astromelia.space",
     "secure": true,
     "changeOrigin": true
   }

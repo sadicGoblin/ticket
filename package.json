@@ -1,6 +1,6 @@
 {
   "name": "angular-base-project",
-  "version": "1.0.0",
+  "version": "4.1.0",
   "description": "Proyecto base de Angular con todas las dependencias configuradas",
   "author": "",
   "main": "main.js",
